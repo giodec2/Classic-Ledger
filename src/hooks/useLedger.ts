@@ -23,53 +23,7 @@ import {
   generateRunningBalanceEntries
 } from '@/types/accounting';
 
-// Sample initial data
-// Sample initial data (kept for reference)
-const _createSampleWorkbook = (): Workbook => {
-  const now = new Date();
-  const sampleEntry: JournalEntry = {
-    id: generateId(),
-    entryNumber: 1,
-    date: now.toISOString(),
-    lines: [
-      {
-        id: generateId(),
-        date: now.toISOString(),
-        description: 'Cash',
-        reference: '',
-        debit: 1000,
-        credit: null,
-        accountCode: '100',
-      },
-      {
-        id: generateId(),
-        date: '',
-        description: 'Capital',
-        reference: '',
-        debit: null,
-        credit: 1000,
-        accountCode: '300',
-      },
-    ],
-    isBalanced: true,
-    totalDebit: 1000,
-    totalCredit: 1000,
-    createdAt: now,
-    updatedAt: now,
-  };
 
-  return {
-    id: generateId(),
-    name: 'Accounting 101 - Homework 1',
-    description: 'Introduction to double-entry bookkeeping',
-    entries: [sampleEntry],
-    accounts: [],
-    runningBalances: [],
-    createdAt: now,
-    updatedAt: now,
-    isBalanced: true,
-  };
-};
 
 export const useLedger = (userId?: string) => {
   const [workbooks, setWorkbooks] = useState<Workbook[]>([]);
