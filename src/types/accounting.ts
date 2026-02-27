@@ -86,11 +86,11 @@ export interface RunningBalanceEntry {
 }
 
 // Account Types for Financial Statements
-export type AccountType = 
-  | 'asset' 
-  | 'liability' 
-  | 'equity' 
-  | 'revenue' 
+export type AccountType =
+  | 'asset'
+  | 'liability'
+  | 'equity'
+  | 'revenue'
   | 'expense'
   | 'contra-asset'
   | 'contra-equity';
@@ -173,10 +173,10 @@ export interface Workbook {
   isBalanced: boolean;
 }
 
-export type ViewMode = 
-  | 'dashboard' 
-  | 'journal' 
-  | 'ledger' 
+export type ViewMode =
+  | 'dashboard'
+  | 'journal'
+  | 'ledger'
   | 'trial-balance'
   | 'running-balance'
   | 'balance-sheet'
@@ -210,7 +210,16 @@ export const formatShortDate = (date: string | Date): string => {
 };
 
 export const generateId = (): string => {
-  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  // Use crypto.randomUUID() to generate proper UUIDs that match the database uuid column type
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  // Fallback for older environments: generate a v4-like UUID
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
 };
 
 export const calculateTotals = (lines: JournalEntryLine[]) => {
@@ -227,60 +236,60 @@ export const calculateTotals = (lines: JournalEntryLine[]) => {
 // Account type classification helper
 export const classifyAccount = (accountName: string): AccountType => {
   const name = accountName.toLowerCase();
-  
+
   // Assets
-  if (name.includes('cash') || name.includes('bank') || name.includes('receivable') || 
-      name.includes('inventory') || name.includes('prepaid') || name.includes('supplies') ||
-      name.includes('equipment') || name.includes('building') || name.includes('land') ||
-      name.includes('vehicle') || name.includes('furniture') || name.includes('computer')) {
+  if (name.includes('cash') || name.includes('bank') || name.includes('receivable') ||
+    name.includes('inventory') || name.includes('prepaid') || name.includes('supplies') ||
+    name.includes('equipment') || name.includes('building') || name.includes('land') ||
+    name.includes('vehicle') || name.includes('furniture') || name.includes('computer')) {
     return 'asset';
   }
-  
+
   // Contra-assets
   if (name.includes('depreciation') || name.includes('allowance') || name.includes('accumulated')) {
     return 'contra-asset';
   }
-  
+
   // Liabilities
-  if (name.includes('payable') || name.includes('loan') || name.includes('debt') || 
-      name.includes('mortgage') || name.includes('unearned') || name.includes('accrued') ||
-      name.includes('warranty')) {
+  if (name.includes('payable') || name.includes('loan') || name.includes('debt') ||
+    name.includes('mortgage') || name.includes('unearned') || name.includes('accrued') ||
+    name.includes('warranty')) {
     return 'liability';
   }
-  
+
   // Equity
-  if (name.includes('capital') || name.includes('equity') || name.includes('retained') || 
-      name.includes('owner') || name.includes('share') || name.includes('stock')) {
+  if (name.includes('capital') || name.includes('equity') || name.includes('retained') ||
+    name.includes('owner') || name.includes('share') || name.includes('stock')) {
     return 'equity';
   }
-  
+
   // Contra-equity
   if (name.includes('drawing') || name.includes('withdrawal') || name.includes('dividend')) {
     return 'contra-equity';
   }
-  
+
   // Revenue
-  if (name.includes('revenue') || name.includes('sales') || name.includes('income') || 
-      name.includes('fee') || name.includes('commission') || name.includes('rent income') ||
-      name.includes('interest income')) {
+  if (name.includes('revenue') || name.includes('sales') || name.includes('income') ||
+    name.includes('fee') || name.includes('commission') || name.includes('rent income') ||
+    name.includes('interest income')) {
     return 'revenue';
   }
-  
+
   // Expense (default)
   return 'expense';
 };
 
 // Calculate months between two dates
 export const calculatePeriods = (
-  startDate: string, 
-  endDate: string, 
+  startDate: string,
+  endDate: string,
   periodType: 'month' | 'quarter' | 'year'
 ): number => {
   const start = new Date(startDate);
   const end = new Date(endDate);
   const diffTime = Math.abs(end.getTime() - start.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
+
   switch (periodType) {
     case 'month':
       return Math.ceil(diffDays / 30);
@@ -303,13 +312,13 @@ export const generateRunningBalanceEntries = (
   const periods = calculatePeriods(startDate, endDate, periodType);
   const amountPerPeriod = originalAmount / periods;
   const entries: RunningBalanceEntry[] = [];
-  
+
   const start = new Date(startDate);
-  
+
   for (let i = 0; i < periods; i++) {
     const periodStart = new Date(start);
     const periodEnd = new Date(start);
-    
+
     switch (periodType) {
       case 'month':
         periodStart.setMonth(start.getMonth() + i);
@@ -327,7 +336,7 @@ export const generateRunningBalanceEntries = (
         periodEnd.setDate(0);
         break;
     }
-    
+
     entries.push({
       id: generateId(),
       periodNumber: i + 1,
@@ -337,6 +346,6 @@ export const generateRunningBalanceEntries = (
       isExpired: false,
     });
   }
-  
+
   return entries;
 };

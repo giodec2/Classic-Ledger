@@ -79,6 +79,9 @@ export const useLedger = (userId?: string) => {
   const [dbLoading, setDbLoading] = useState(true);
   // Track which workbook IDs have unsaved changes
   const dirtyIds = useRef<Set<string>>(new Set());
+  // Keep a ref to the latest workbooks so debounce-save never reads stale data
+  const workbooksRef = useRef<Workbook[]>(workbooks);
+  useEffect(() => { workbooksRef.current = workbooks; }, [workbooks]);
 
   // Helper: update workbooks state AND mark the changed workbook as dirty
   const markDirty = useCallback((workbookId: string, updater: (prev: Workbook[]) => Workbook[]) => {
@@ -90,22 +93,37 @@ export const useLedger = (userId?: string) => {
   useEffect(() => {
     if (!userId) { setDbLoading(false); return; }
     setDbLoading(true);
+    console.log('[Supabase] Loading workbooks for user:', userId);
     supabase
       .from('workbooks')
       .select('id, name, data, created_at, updated_at')
       .eq('user_id', userId)
       .order('updated_at', { ascending: false })
       .then(({ data, error }) => {
-        if (error) { console.error('Load error:', error); setDbLoading(false); return; }
+        if (error) {
+          console.error('[Supabase] Load error:', error);
+          setDbLoading(false);
+          return;
+        }
+        console.log('[Supabase] Loaded rows:', data?.length ?? 0);
         const loaded: Workbook[] = (data ?? []).map((row) => {
-          const d = row.data as Omit<Workbook, 'id' | 'name' | 'createdAt' | 'updatedAt'>;
+          const d = row.data as Record<string, unknown>;
+          // Deep-deserialize Date fields inside entries stored as ISO strings
+          const entries = Array.isArray(d.entries)
+            ? (d.entries as Record<string, unknown>[]).map((e) => ({
+              ...e,
+              createdAt: e.createdAt ? new Date(e.createdAt as string) : new Date(),
+              updatedAt: e.updatedAt ? new Date(e.updatedAt as string) : new Date(),
+            }))
+            : [];
           return {
             ...d,
+            entries,
             id: row.id as string,
             name: row.name as string,
             createdAt: new Date(row.created_at as string),
             updatedAt: new Date(row.updated_at as string),
-          };
+          } as Workbook;
         });
         setWorkbooks(loaded);
         setDbLoading(false);
@@ -118,18 +136,26 @@ export const useLedger = (userId?: string) => {
     const timer = setTimeout(async () => {
       const idsToSave = [...dirtyIds.current];
       dirtyIds.current.clear();
+      // Always read from the ref to get the latest state, avoiding stale closures
+      const currentWorkbooks = workbooksRef.current;
       for (const id of idsToSave) {
-        const wb = workbooks.find(w => w.id === id);
-        if (!wb) continue;
+        const wb = currentWorkbooks.find(w => w.id === id);
+        if (!wb) { console.warn('[Supabase] Skipping save for missing workbook:', id); continue; }
         const { id: _id, name, createdAt, updatedAt, ...rest } = wb;
-        await supabase.from('workbooks').upsert({
+        console.log('[Supabase] Saving workbook:', id, name);
+        const { error } = await supabase.from('workbooks').upsert({
           id,
           user_id: userId,
           name,
           data: rest,
-          created_at: createdAt.toISOString(),
+          created_at: createdAt instanceof Date ? createdAt.toISOString() : String(createdAt),
           updated_at: new Date().toISOString(),
         }, { onConflict: 'id' });
+        if (error) {
+          console.error('[Supabase] Save error for workbook', id, ':', error);
+        } else {
+          console.log('[Supabase] Saved workbook successfully:', id);
+        }
       }
     }, 800);
     return () => clearTimeout(timer);
@@ -159,20 +185,26 @@ export const useLedger = (userId?: string) => {
       updatedAt: now,
       isBalanced: true,
     };
-    setWorkbooks(prev => [newWorkbook, ...prev]);
+    // Use markDirty so the unified debounce-save path handles persistence
+    markDirty(id, prev => [newWorkbook, ...prev]);
+    // Also do an immediate insert so the row exists right away (the debounce upsert
+    // will update it with the same data shape later if needed)
     if (userId) {
+      const { id: _id, name: _name, createdAt, updatedAt, ...rest } = newWorkbook;
+      console.log('[Supabase] Creating workbook:', id, name);
       const { error } = await supabase.from('workbooks').insert({
         id,
         user_id: userId,
         name,
-        data: { description, entries: [], accounts: [], runningBalances: [], isBalanced: true },
-        created_at: now.toISOString(),
-        updated_at: now.toISOString(),
+        data: rest,
+        created_at: createdAt.toISOString(),
+        updated_at: updatedAt.toISOString(),
       });
-      if (error) console.error('Create workbook error:', error);
+      if (error) console.error('[Supabase] Create workbook error:', error);
+      else console.log('[Supabase] Created workbook successfully:', id);
     }
     return id;
-  }, [userId]);
+  }, [userId, markDirty]);
 
   const deleteWorkbook = useCallback(async (id: string) => {
     setWorkbooks(prev => prev.filter(wb => wb.id !== id));
