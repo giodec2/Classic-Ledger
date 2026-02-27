@@ -1,0 +1,222 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Classic Ledger Design System */
+    --color-ink: #1A1A1A;
+    --color-ivory: #F7F5F0;
+    --color-surface: #FFFFFF;
+    --color-graphite: #2C2C2C;
+    --color-muted: #949494;
+    --color-accent: #C13D2F;
+    --color-guide: #E5E0D6;
+    --color-ink-black: #0B0B0C;
+    --color-text-secondary: #6E6B66;
+    --color-pale-red: #FDECEA;
+
+    /* shadcn overrides */
+    --background: 43 23% 95%;
+    --foreground: 0 0% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+    --primary: 0 0% 10%;
+    --primary-foreground: 43 23% 95%;
+    --secondary: 43 18% 90%;
+    --secondary-foreground: 0 0% 10%;
+    --muted: 43 18% 90%;
+    --muted-foreground: 0 0% 58%;
+    --accent: 5 65% 47%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 5 65% 47%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 40 14% 87%;
+    --input: 40 14% 87%;
+    --ring: 0 0% 10%;
+    --radius: 2px;
+
+    /* Typography */
+    --font-serif: 'Source Serif 4', serif;
+    --font-display: 'Fraunces', serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-sans: 'Inter', sans-serif;
+
+    /* Spacing */
+    --spacing-unit: 8px;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-serif);
+    background-color: var(--color-ivory);
+    color: var(--color-graphite);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Typography Utilities */
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .font-serif {
+    font-family: var(--font-serif);
+  }
+
+  .font-mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .font-sans {
+    font-family: var(--font-sans);
+  }
+
+  /* Paper grain overlay */
+  .paper-grain {
+    position: relative;
+  }
+
+  .paper-grain::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.04;
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-guide);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-muted);
+  }
+
+  /* Selection */
+  ::selection {
+    background: var(--color-guide);
+    color: var(--color-ink);
+  }
+
+  /* Focus styles */
+  :focus-visible {
+    outline: 1px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+
+  /* Input reset */
+  input, textarea {
+    font-family: inherit;
+  }
+
+  /* Monospace number formatting */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Ledger line border */
+  .ledger-line {
+    border-bottom: 1px solid var(--color-guide);
+  }
+
+  /* Active field styling */
+  .active-field {
+    background-color: var(--color-surface);
+    border-bottom-color: var(--color-ink) !important;
+  }
+
+  /* Credit indent */
+  .credit-indent {
+    padding-left: 2rem;
+  }
+
+  /* Double underline for totals */
+  .double-underline {
+    position: relative;
+  }
+
+  .double-underline::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-top: 1px solid var(--color-ink);
+    border-bottom: 1px solid var(--color-ink);
+  }
+
+  /* Blinking cursor */
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+
+  .cursor-blink::after {
+    content: '|';
+    animation: blink 1s infinite;
+    color: var(--color-ink);
+  }
+
+  /* Stamp animation */
+  @keyframes stamp {
+    0% {
+      transform: scale(1.6) rotate(-8deg);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1) rotate(0deg);
+      opacity: 1;
+    }
+  }
+
+  .stamp-animate {
+    animation: stamp 0.3s ease-out forwards;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Tracking utilities */
+  .tracking-tight {
+    letter-spacing: -0.02em;
+  }
+
+  .tracking-wide {
+    letter-spacing: 0.08em;
+  }
+}

@@ -1,0 +1,158 @@
+/* Classic Ledger - App Specific Styles */
+
+/* Ensure smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Remove default focus outline and add custom */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 1px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+/* Input number styling - remove spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Ensure proper font rendering */
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Paper grain animation - subtle pulse */
+@keyframes grain {
+  0%, 100% { opacity: 0.04; }
+  50% { opacity: 0.05; }
+}
+
+.paper-grain::before {
+  animation: grain 8s ease-in-out infinite;
+}
+
+/* Table row hover effect */
+.ledger-row {
+  transition: background-color 0.15s ease;
+}
+
+.ledger-row:hover {
+  background-color: var(--color-surface);
+}
+
+/* Credit indent animation */
+.credit-indent {
+  transition: padding-left 0.2s ease;
+}
+
+/* Balance bar transition */
+.balance-bar {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Stamp hover effect */
+.stamp {
+  transition: transform 0.2s ease;
+}
+
+.stamp:hover {
+  transform: scale(1.05) rotate(-8deg);
+}
+
+/* Card hover lift */
+.card-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Button press effect */
+button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Dialog backdrop */
+[data-state="open"] > [data-radix-dialog-overlay] {
+  background-color: rgba(26, 26, 26, 0.4);
+  backdrop-filter: blur(4px);
+}
+
+/* Ensure proper z-index stacking */
+nav {
+  z-index: 50;
+}
+
+/* Scrollbar styling for webkit browsers */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-guide);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted);
+}
+
+/* Selection color */
+::selection {
+  background-color: var(--color-guide);
+  color: var(--color-ink);
+}
+
+/* Placeholder styling */
+::placeholder {
+  color: var(--color-muted);
+  opacity: 1;
+}
+
+/* Disabled state */
+:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive typography adjustments */
+@media (max-width: 768px) {
+  .font-display {
+    letter-spacing: -0.01em;
+  }
+}
+
+/* Print styles */
+@media print {
+  .paper-grain::before {
+    display: none;
+  }
+  
+  nav,
+  button {
+    display: none !important;
+  }
+  
+  section {
+    page-break-inside: avoid;
+  }
+}
