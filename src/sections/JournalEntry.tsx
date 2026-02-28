@@ -159,7 +159,7 @@ const EditableRow = ({
       <div className="flex justify-center">
         <button
           onClick={() => onDelete(line.id)}
-          className="p-1 text-muted hover:text-accounting-red transition-colors opacity-0 hover:opacity-100 focus:opacity-100"
+          className="p-1 text-muted hover:text-accounting-red transition-colors"
           title="Delete line"
         >
           <Trash2 className="w-3 h-3" />
@@ -191,7 +191,7 @@ const EntryBlock = ({
   const blockRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div ref={blockRef} className="border border-guide rounded-paper bg-surface overflow-hidden">
+    <div ref={blockRef} className="border border-guide rounded-paper bg-surface">
       {/* Entry Header */}
       <div className="flex items-center justify-between px-4 py-2 bg-ivory border-b border-guide">
         <div className="flex items-center gap-3">

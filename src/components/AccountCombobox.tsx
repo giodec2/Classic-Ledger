@@ -1,58 +1,36 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronDown, Plus } from 'lucide-react';
 
 // Standard chart of accounts — always available as suggestions
 const STANDARD_ACCOUNTS = [
     'Cash',
-    'Petty Cash',
-    'Bank',
     'Accounts Receivable',
     'Notes Receivable',
     'Inventory',
-    'Supplies',
     'Prepaid Insurance',
     'Prepaid Rent',
     'Prepaid Expenses',
-    'Equipment',
-    'Furniture',
-    'Vehicles',
-    'Buildings',
-    'Land',
     'Accumulated Depreciation',
     'Accounts Payable',
     'Notes Payable',
-    'Wages Payable',
     'Salaries Payable',
     'Interest Payable',
     'Taxes Payable',
     'Unearned Revenue',
-    'Mortgage Payable',
-    'Loans Payable',
     'Capital Stock',
-    'Owner\'s Capital',
+    'Owner\'s Equity',
     'Retained Earnings',
-    'Drawings',
     'Dividends',
     'Service Revenue',
     'Sales Revenue',
-    'Fees Earned',
-    'Interest Income',
-    'Rent Income',
-    'Commission Revenue',
     'Rent Expense',
-    'Wages Expense',
     'Salaries Expense',
-    'Utilities Expense',
     'Insurance Expense',
     'Supplies Expense',
     'Depreciation Expense',
     'Interest Expense',
     'Advertising Expense',
-    'Repairs Expense',
-    'Miscellaneous Expense',
-    'Bad Debt Expense',
-    'Cost of Goods Sold',
-    'Allowance for Doubtful Accounts',
 ];
 
 interface AccountComboboxProps {
@@ -78,8 +56,10 @@ export const AccountCombobox = ({
 }: AccountComboboxProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState('');
+    const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 288 });
     const inputRef = useRef<HTMLInputElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
     // Merge existing accounts with standard accounts (deduplicated, case-insensitive)
     const allAccounts = (() => {
@@ -118,7 +98,10 @@ export const AccountCombobox = ({
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
-            if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+            if (
+                containerRef.current && !containerRef.current.contains(e.target as Node) &&
+                dropdownRef.current && !dropdownRef.current.contains(e.target as Node)
+            ) {
                 setIsOpen(false);
                 setSearch('');
                 onBlur?.();
@@ -127,6 +110,18 @@ export const AccountCombobox = ({
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [onBlur]);
+
+    // Update dropdown position when open
+    useEffect(() => {
+        if (isOpen && containerRef.current) {
+            const rect = containerRef.current.getBoundingClientRect();
+            setDropdownPos({
+                top: rect.bottom + 4,
+                left: rect.left,
+                width: Math.max(288, rect.width),
+            });
+        }
+    }, [isOpen]);
 
     const handleSelect = (accountName: string) => {
         onChange(accountName);
@@ -191,8 +186,12 @@ export const AccountCombobox = ({
                 </button>
             </div>
 
-            {isOpen && (
-                <div className="absolute left-0 top-full mt-1.5 w-72 max-h-80 overflow-y-auto bg-surface border border-guide rounded-paper shadow-xl z-50">
+            {isOpen && createPortal(
+                <div
+                    ref={dropdownRef}
+                    style={{ position: 'fixed', top: dropdownPos.top, left: dropdownPos.left, width: dropdownPos.width }}
+                    className="max-h-80 overflow-y-auto bg-surface border border-guide rounded-paper shadow-xl z-[9999]"
+                >
 
                     {showCreateOption && (
                         <button
@@ -251,7 +250,8 @@ export const AccountCombobox = ({
                             <span className="font-serif text-[14px] text-muted">No accounts found</span>
                         </div>
                     )}
-                </div>
+                </div>,
+                document.body
             )}
         </div>
     );
