@@ -5,6 +5,7 @@ import { Plus, Trash2, AlertCircle, CheckCircle2, Download, BookOpen, FileText }
 import { formatCurrency, formatShortDate, type JournalEntryLine, type JournalEntry as JournalEntryType } from '@/types/accounting';
 import { Button } from '@/components/ui/button';
 import { downloadAsImage } from '@/lib/downloadImage';
+import { AccountCombobox } from '@/components/AccountCombobox';
 
 /* ─────────────────── Date Input Helper ─────────────────── */
 
@@ -52,6 +53,7 @@ const DateInput = ({
 interface EditableRowProps {
   line: JournalEntryLine;
   isFirstRow: boolean;
+  existingAccounts: string[];
   onUpdate: (lineId: string, updates: Partial<JournalEntryLine>) => void;
   onDelete: (lineId: string) => void;
   onAddLine: () => void;
@@ -60,6 +62,7 @@ interface EditableRowProps {
 const EditableRow = ({
   line,
   isFirstRow,
+  existingAccounts,
   onUpdate,
   onDelete,
   onAddLine,
@@ -93,17 +96,17 @@ const EditableRow = ({
         )}
       </div>
 
-      {/* Description */}
+      {/* Account Name */}
       <div className={`px-2 ${isCredit ? 'pl-8' : ''}`}>
-        <input
-          type="text"
+        <AccountCombobox
           value={line.description}
-          onChange={(e) => onUpdate(line.id, { description: e.target.value })}
+          onChange={(val) => onUpdate(line.id, { description: val })}
+          existingAccounts={existingAccounts}
+          placeholder={isCredit ? 'Credit account' : 'Debit account'}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           onKeyDown={handleKeyDown}
-          placeholder={isCredit ? 'Credit account' : 'Debit account'}
-          className="w-full bg-transparent font-serif text-body text-ink placeholder:text-muted outline-none"
+          className="font-serif text-body text-ink placeholder:text-muted"
         />
       </div>
 
@@ -170,6 +173,7 @@ const EditableRow = ({
 
 interface EntryBlockProps {
   entry: JournalEntryType;
+  existingAccounts: string[];
   onUpdateLine: (entryId: string, lineId: string, updates: Partial<JournalEntryLine>) => void;
   onDeleteLine: (entryId: string, lineId: string) => void;
   onAddLine: (entryId: string) => void;
@@ -178,6 +182,7 @@ interface EntryBlockProps {
 
 const EntryBlock = ({
   entry,
+  existingAccounts,
   onUpdateLine,
   onDeleteLine,
   onAddLine,
@@ -226,6 +231,7 @@ const EntryBlock = ({
             key={line.id}
             line={line}
             isFirstRow={index === 0}
+            existingAccounts={existingAccounts}
             onUpdate={(lineId, updates) => onUpdateLine(entry.id, lineId, updates)}
             onDelete={(lineId) => onDeleteLine(entry.id, lineId)}
             onAddLine={() => onAddLine(entry.id)}
@@ -366,6 +372,20 @@ export const JournalEntry = () => {
 
   // ── Full Journal View ──
   const entries = currentWorkbook.entries;
+
+  // Collect all unique account names used in this workbook
+  const existingAccounts = (() => {
+    const seen = new Set<string>();
+    for (const entry of entries) {
+      for (const line of entry.lines) {
+        if (line.description?.trim()) {
+          seen.add(line.description.trim());
+        }
+      }
+    }
+    return Array.from(seen);
+  })();
+
   const totalDebit = entries.reduce((s, e) => s + e.totalDebit, 0);
   const totalCredit = entries.reduce((s, e) => s + e.totalCredit, 0);
   const allBalanced = entries.every(e => e.isBalanced);
@@ -420,6 +440,7 @@ export const JournalEntry = () => {
           <EntryBlock
             key={entry.id}
             entry={entry}
+            existingAccounts={existingAccounts}
             onUpdateLine={handleUpdateLine}
             onDeleteLine={handleDeleteLine}
             onAddLine={handleAddLine}
