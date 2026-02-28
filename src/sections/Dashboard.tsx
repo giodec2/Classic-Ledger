@@ -29,26 +29,26 @@ export const Dashboard = () => {
         { opacity: 0, y: 18 },
         { opacity: 1, y: 0, duration: 0.45 }
       )
-      .fromTo(subheadRef.current,
-        { opacity: 0, y: 14 },
-        { opacity: 1, y: 0, duration: 0.45 },
-        '-=0.30'
-      )
-      .fromTo(dateRef.current,
-        { opacity: 0, y: 10 },
-        { opacity: 1, y: 0, duration: 0.45 },
-        '-=0.35'
-      )
-      .fromTo(newCardRef.current,
-        { opacity: 0, y: 24, scale: 0.98 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.55 },
-        '-=0.40'
-      )
-      .fromTo(listRef.current?.children || [],
-        { opacity: 0, y: 10 },
-        { opacity: 1, y: 0, duration: 0.4, stagger: 0.08 },
-        '-=0.35'
-      );
+        .fromTo(subheadRef.current,
+          { opacity: 0, y: 14 },
+          { opacity: 1, y: 0, duration: 0.45 },
+          '-=0.30'
+        )
+        .fromTo(dateRef.current,
+          { opacity: 0, y: 10 },
+          { opacity: 1, y: 0, duration: 0.45 },
+          '-=0.35'
+        )
+        .fromTo(newCardRef.current,
+          { opacity: 0, y: 24, scale: 0.98 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.55 },
+          '-=0.40'
+        )
+        .fromTo(listRef.current?.children || [],
+          { opacity: 0, y: 10 },
+          { opacity: 1, y: 0, duration: 0.4, stagger: 0.08 },
+          '-=0.35'
+        );
     });
 
     return () => ctx.revert();
@@ -69,21 +69,39 @@ export const Dashboard = () => {
     <section className="min-h-screen pt-32 pb-16 px-[8vw]">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-          {/* Left column - Greeting */}
           <div className="space-y-6">
-            <h1 
+            <h1
               ref={greetingRef}
               className="font-display text-display-lg text-ink tracking-tight"
             >
               Classic Ledger
             </h1>
-            <p 
+            <p
               ref={subheadRef}
               className="font-serif text-body text-text-secondary max-w-md"
             >
               Your ledger desk. Open a workbook to begin recording transactions with precision.
             </p>
-            <div ref={dateRef} className="font-mono text-data text-muted pt-4">
+
+            {/* Learn Section Entry Point */}
+            <div ref={dateRef} className="pt-2">
+              <button
+                onClick={() => {
+                  useLedgerContext().setCurrentView('learning');
+                }}
+                className="inline-flex items-center gap-2 px-5 py-3 bg-surface border border-guide rounded-paper hover:border-ink text-text-secondary hover:text-ink transition-all group shadow-sm hover:shadow-md"
+              >
+                <div className="w-8 h-8 rounded-full bg-ink/5 flex items-center justify-center group-hover:bg-ink group-hover:text-ivory transition-colors">
+                  <BookOpen className="w-4 h-4" />
+                </div>
+                <div className="text-left leading-tight">
+                  <span className="block font-sans text-label uppercase tracking-wide">Learn Basics</span>
+                  <span className="block font-serif text-[13px] text-muted group-hover:text-text-secondary transition-colors">Accounting 101 guide</span>
+                </div>
+              </button>
+            </div>
+
+            <div className="font-mono text-data text-muted pt-8 border-t border-guide w-1/2">
               {currentDate}
             </div>
           </div>
@@ -140,9 +158,8 @@ export const Dashboard = () => {
                               minute: '2-digit',
                             })}
                           </div>
-                          <div className={`flex items-center gap-1.5 font-mono text-micro ${
-                            workbook.isBalanced ? 'text-green-600' : 'text-accounting-red'
-                          }`}>
+                          <div className={`flex items-center gap-1.5 font-mono text-micro ${workbook.isBalanced ? 'text-green-600' : 'text-accounting-red'
+                            }`}>
                             {workbook.isBalanced ? (
                               <>
                                 <CheckCircle2 className="w-3 h-3" />

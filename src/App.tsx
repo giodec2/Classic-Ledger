@@ -17,6 +17,8 @@ import { useAuth } from '@/hooks/useAuth';
 import type { User } from '@supabase/supabase-js';
 import './App.css';
 
+import { LearningView } from '@/sections/LearningView';
+
 gsap.registerPlugin(ScrollTrigger);
 
 // Loading spinner styled to match the app aesthetic
@@ -58,6 +60,7 @@ function AppContent({ user }: { user: User }) {
             <Footer />
           </>
         )}
+        {currentView === 'learning' && <LearningView />}
         {currentView === 'journal' && <JournalEntry />}
         {currentView === 'ledger' && <TAccountLedger />}
         {currentView === 'trial-balance' && <TrialBalance />}
