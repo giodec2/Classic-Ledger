@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { formatShortDate } from '@/types/accounting';
 
 export const Dashboard = () => {
-  const { workbooks, createWorkbook, deleteWorkbook, selectWorkbook } = useLedgerContext();
+  const { workbooks, createWorkbook, deleteWorkbook, selectWorkbook, setCurrentView } = useLedgerContext();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [newWorkbookName, setNewWorkbookName] = useState('');
   const [newWorkbookDesc, setNewWorkbookDesc] = useState('');
@@ -86,22 +86,20 @@ export const Dashboard = () => {
             {/* Learn Section Entry Point */}
             <div ref={dateRef} className="pt-2">
               <button
-                onClick={() => {
-                  useLedgerContext().setCurrentView('learning');
-                }}
-                className="inline-flex items-center gap-2 px-5 py-3 bg-surface border border-guide rounded-paper hover:border-ink text-text-secondary hover:text-ink transition-all group shadow-sm hover:shadow-md"
+                onClick={() => setCurrentView('learning')}
+                className="inline-flex items-center gap-2 px-5 py-3 bg-surface border border-guide rounded-paper hover:border-orange-400 text-text-secondary transition-all group shadow-sm hover:shadow-md"
               >
-                <div className="w-8 h-8 rounded-full bg-ink/5 flex items-center justify-center group-hover:bg-ink group-hover:text-ivory transition-colors">
+                <div className="w-8 h-8 rounded-full bg-ink/5 flex items-center justify-center group-hover:bg-orange-500 group-hover:text-white transition-colors">
                   <BookOpen className="w-4 h-4" />
                 </div>
                 <div className="text-left leading-tight">
-                  <span className="block font-sans text-label uppercase tracking-wide">Learn Basics</span>
-                  <span className="block font-serif text-[13px] text-muted group-hover:text-text-secondary transition-colors">Accounting 101 guide</span>
+                  <span className="block font-sans text-label uppercase tracking-wide group-hover:text-orange-600 transition-colors text-ink">Learn Basics</span>
+                  <span className="block font-serif text-[13px] text-text-secondary group-hover:text-orange-600/80 transition-colors">Accounting 101 guide</span>
                 </div>
               </button>
             </div>
 
-            <div className="font-mono text-data text-muted pt-8 border-t border-guide w-1/2">
+            <div className="font-mono text-data text-text-secondary pt-8 border-t border-guide w-1/2">
               {currentDate}
             </div>
           </div>
