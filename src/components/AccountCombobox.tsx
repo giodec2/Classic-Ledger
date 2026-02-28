@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { ChevronDown, Plus, Search } from 'lucide-react';
+import { ChevronDown, Plus } from 'lucide-react';
 
 // Standard chart of accounts — always available as suggestions
 const STANDARD_ACCOUNTS = [
@@ -192,21 +192,15 @@ export const AccountCombobox = ({
             </div>
 
             {isOpen && (
-                <div className="absolute left-0 top-full mt-1 w-64 max-h-56 overflow-y-auto bg-surface border border-guide rounded-paper shadow-lg z-50">
-                    <div className="px-3 py-1.5 border-b border-guide bg-ivory/50 flex items-center gap-1.5">
-                        <Search className="w-3 h-3 text-muted" />
-                        <span className="font-sans text-[10px] uppercase tracking-wide text-muted">
-                            {filterText ? `Results for "${filterText}"` : 'Type to search or select'}
-                        </span>
-                    </div>
+                <div className="absolute left-0 top-full mt-1.5 w-72 max-h-80 overflow-y-auto bg-surface border border-guide rounded-paper shadow-xl z-50">
 
                     {showCreateOption && (
                         <button
                             onClick={() => handleSelect(search.trim())}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-ivory transition-colors border-b border-guide"
+                            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left hover:bg-ivory transition-colors border-b border-guide"
                         >
-                            <Plus className="w-3 h-3 text-accounting-red" />
-                            <span className="font-serif text-body text-ink">
+                            <Plus className="w-3.5 h-3.5 text-accounting-red flex-shrink-0" />
+                            <span className="font-serif text-[14px] text-ink">
                                 Create "<strong>{search.trim()}</strong>"
                             </span>
                         </button>
@@ -214,8 +208,8 @@ export const AccountCombobox = ({
 
                     {workbookAccounts.length > 0 && (
                         <div>
-                            <div className="px-3 py-1 bg-ivory/30">
-                                <span className="font-sans text-[9px] uppercase tracking-widest text-muted font-medium">
+                            <div className="px-4 py-1.5 bg-ivory/40 border-b border-guide">
+                                <span className="font-sans text-[10px] uppercase tracking-widest text-text-secondary font-semibold">
                                     Your Accounts
                                 </span>
                             </div>
@@ -223,10 +217,10 @@ export const AccountCombobox = ({
                                 <button
                                     key={`wb-${a.name}`}
                                     onClick={() => handleSelect(a.name)}
-                                    className={`w-full text-left px-3 py-1.5 hover:bg-ivory transition-colors ${value.toLowerCase() === a.name.toLowerCase() ? 'bg-ivory' : ''
+                                    className={`w-full text-left px-4 py-2 hover:bg-ivory/70 transition-colors ${value.toLowerCase() === a.name.toLowerCase() ? 'bg-ivory font-medium' : ''
                                         }`}
                                 >
-                                    <span className="font-serif text-body text-ink">{a.name}</span>
+                                    <span className="font-serif text-[14px] text-ink">{a.name}</span>
                                 </button>
                             ))}
                         </div>
@@ -234,8 +228,8 @@ export const AccountCombobox = ({
 
                     {standardAccounts.length > 0 && (
                         <div>
-                            <div className="px-3 py-1 bg-ivory/30 border-t border-guide">
-                                <span className="font-sans text-[9px] uppercase tracking-widest text-muted font-medium">
+                            <div className="px-4 py-1.5 bg-ivory/40 border-y border-guide">
+                                <span className="font-sans text-[10px] uppercase tracking-widest text-text-secondary font-semibold">
                                     Standard Accounts
                                 </span>
                             </div>
@@ -243,18 +237,18 @@ export const AccountCombobox = ({
                                 <button
                                     key={`std-${a.name}`}
                                     onClick={() => handleSelect(a.name)}
-                                    className={`w-full text-left px-3 py-1.5 hover:bg-ivory transition-colors ${value.toLowerCase() === a.name.toLowerCase() ? 'bg-ivory' : ''
+                                    className={`w-full text-left px-4 py-2 hover:bg-ivory/70 transition-colors ${value.toLowerCase() === a.name.toLowerCase() ? 'bg-ivory font-medium' : ''
                                         }`}
                                 >
-                                    <span className="font-serif text-body text-ink">{a.name}</span>
+                                    <span className="font-serif text-[14px] text-ink">{a.name}</span>
                                 </button>
                             ))}
                         </div>
                     )}
 
                     {filtered.length === 0 && !showCreateOption && (
-                        <div className="px-3 py-4 text-center">
-                            <span className="font-serif text-body text-muted">No accounts found</span>
+                        <div className="px-4 py-6 text-center">
+                            <span className="font-serif text-[14px] text-muted">No accounts found</span>
                         </div>
                     )}
                 </div>
