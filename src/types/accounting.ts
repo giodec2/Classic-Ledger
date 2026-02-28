@@ -202,7 +202,12 @@ export const formatDate = (date: string | Date): string => {
 };
 
 export const formatShortDate = (date: string | Date): string => {
+  // If it's already in DD/MM format, return as-is
+  if (typeof date === 'string' && /^\d{1,2}\/\d{1,2}$/.test(date.trim())) {
+    return date.trim();
+  }
   const d = typeof date === 'string' ? new Date(date) : date;
+  if (isNaN(d.getTime())) return typeof date === 'string' ? date : '';
   return d.toLocaleDateString('en-GB', {
     day: '2-digit',
     month: '2-digit',

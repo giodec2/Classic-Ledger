@@ -330,6 +330,24 @@ export const useLedger = (userId?: string) => {
     }));
   }, [markDirty]);
 
+  const deleteJournalEntry = useCallback((workbookId: string, entryId: string) => {
+    markDirty(workbookId, prev => prev.map(wb => {
+      if (wb.id !== workbookId) return wb;
+      const filtered = wb.entries.filter(e => e.id !== entryId);
+      // Re-number remaining entries
+      const renumbered = filtered.map((e, i) => ({ ...e, entryNumber: i + 1 }));
+      return {
+        ...wb,
+        entries: renumbered,
+        updatedAt: new Date(),
+      };
+    }));
+    // If we deleted the current entry, clear it
+    if (currentEntryId === entryId) {
+      setCurrentEntryId(null);
+    }
+  }, [markDirty, currentEntryId]);
+
   // Generate T-Accounts from journal entries
   const generateTAccounts = useCallback((workbookId: string): TAccount[] => {
     const workbook = workbooks.find(wb => wb.id === workbookId);
@@ -727,6 +745,7 @@ export const useLedger = (userId?: string) => {
     selectWorkbook,
     createJournalEntry,
     updateJournalEntry,
+    deleteJournalEntry,
     addJournalLine,
     updateJournalLine,
     deleteJournalLine,

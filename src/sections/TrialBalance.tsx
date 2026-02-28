@@ -121,6 +121,25 @@ export const TrialBalance = () => {
             </p>
           </div>
         </div>
+
+        {/* Explanation */}
+        <div className="mt-8 p-4 border border-guide rounded-paper bg-ivory/50">
+          <h3 className="font-sans text-label uppercase tracking-wide text-text-secondary mb-3">
+            About Trial Balance
+          </h3>
+          <p className="font-serif text-body text-text-secondary mb-3">
+            A trial balance is a bookkeeping worksheet in which the balances of all ledgers are compiled into
+            debit and credit account column totals that are equal. It verifies the mathematical accuracy of
+            the bookkeeping system.
+          </p>
+          <div className="flex items-start gap-2 text-text-secondary">
+            <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <p className="font-serif text-body">
+              A balanced trial balance indicates that for every debit entry, a corresponding credit entry was recorded.
+              However, it does not guarantee that all entries are correct—only that they are mathematically balanced.
+            </p>
+          </div>
+        </div>
       </section>
     );
   }
@@ -214,8 +233,8 @@ export const TrialBalance = () => {
 
       {/* Status Bar */}
       <div className={`mt-6 p-4 rounded-paper border flex items-center justify-between ${trialBalance.isBalanced
-          ? 'bg-green-50 border-green-200'
-          : 'bg-pale-red border-accounting-red/30'
+        ? 'bg-green-50 border-green-200'
+        : 'bg-pale-red border-accounting-red/30'
         }`}>
         <div className="flex items-center gap-3">
           {trialBalance.isBalanced ? (

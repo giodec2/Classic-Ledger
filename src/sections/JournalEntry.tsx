@@ -1,8 +1,53 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { useLedgerContext } from '@/hooks/LedgerContext';
-import { Plus, Trash2, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { formatCurrency, formatShortDate, type JournalEntryLine } from '@/types/accounting';
+import { Plus, Trash2, AlertCircle, CheckCircle2, Download, BookOpen, FileText } from 'lucide-react';
+import { formatCurrency, formatShortDate, type JournalEntryLine, type JournalEntry as JournalEntryType } from '@/types/accounting';
+import { Button } from '@/components/ui/button';
+import { downloadAsImage } from '@/lib/downloadImage';
+
+/* ─────────────────── Date Input Helper ─────────────────── */
+
+const DateInput = ({
+  value,
+  onChange,
+  onFocus,
+  onBlur,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  onFocus: () => void;
+  onBlur: () => void;
+}) => {
+  // Display raw DD/MM strings, or format ISO dates
+  const displayValue = value ? formatShortDate(value) : '';
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let raw = e.target.value.replace(/[^0-9/]/g, '');
+    // Auto-insert slash after 2 digits
+    if (raw.length === 2 && !raw.includes('/')) {
+      raw += '/';
+    }
+    // Max length DD/MM = 5 chars
+    if (raw.length > 5) raw = raw.slice(0, 5);
+    onChange(raw);
+  };
+
+  return (
+    <input
+      type="text"
+      value={displayValue}
+      onChange={handleChange}
+      onFocus={onFocus}
+      onBlur={onBlur}
+      placeholder="DD/MM"
+      maxLength={5}
+      className="w-full bg-transparent font-mono text-data text-ink placeholder:text-muted outline-none"
+    />
+  );
+};
+
+/* ─────────────────── Editable Line Row ─────────────────── */
 
 interface EditableRowProps {
   line: JournalEntryLine;
@@ -31,21 +76,17 @@ const EditableRow = ({
 
   return (
     <div
-      className={`grid grid-cols-[100px_1fr_60px_120px_120px_40px] gap-2 items-center h-12 border-b border-guide transition-all ${
-        isFocused ? 'bg-surface border-b-ink' : 'bg-transparent'
-      }`}
+      className={`grid grid-cols-[80px_1fr_60px_110px_110px_36px] gap-1 items-center h-11 border-b border-guide transition-all ${isFocused ? 'bg-surface border-b-ink' : 'bg-transparent'
+        }`}
     >
       {/* Date */}
       <div className="px-2">
         {isFirstRow ? (
-          <input
-            type="text"
-            value={line.date ? formatShortDate(line.date) : ''}
-            onChange={(e) => onUpdate(line.id, { date: e.target.value })}
+          <DateInput
+            value={line.date}
+            onChange={(val) => onUpdate(line.id, { date: val })}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            placeholder="DD/MM"
-            className="w-full bg-transparent font-mono text-data text-ink placeholder:text-muted outline-none"
           />
         ) : (
           <span className="font-mono text-data text-muted" />
@@ -115,40 +156,116 @@ const EditableRow = ({
       <div className="flex justify-center">
         <button
           onClick={() => onDelete(line.id)}
-          className="p-1.5 text-muted hover:text-accounting-red transition-colors opacity-0 hover:opacity-100 focus:opacity-100"
+          className="p-1 text-muted hover:text-accounting-red transition-colors opacity-0 hover:opacity-100 focus:opacity-100"
           title="Delete line"
         >
-          <Trash2 className="w-3.5 h-3.5" />
+          <Trash2 className="w-3 h-3" />
         </button>
       </div>
     </div>
   );
 };
 
+/* ─────────────────── Single Entry Block ─────────────────── */
+
+interface EntryBlockProps {
+  entry: JournalEntryType;
+  workbookId: string;
+  onUpdateLine: (entryId: string, lineId: string, updates: Partial<JournalEntryLine>) => void;
+  onDeleteLine: (entryId: string, lineId: string) => void;
+  onAddLine: (entryId: string) => void;
+  onDeleteEntry: (entryId: string) => void;
+}
+
+const EntryBlock = ({
+  entry,
+  workbookId,
+  onUpdateLine,
+  onDeleteLine,
+  onAddLine,
+  onDeleteEntry,
+}: EntryBlockProps) => {
+  const blockRef = useRef<HTMLDivElement>(null);
+
+  return (
+    <div ref={blockRef} className="border border-guide rounded-paper bg-surface overflow-hidden">
+      {/* Entry Header */}
+      <div className="flex items-center justify-between px-4 py-2 bg-ivory border-b border-guide">
+        <div className="flex items-center gap-3">
+          <span className="font-mono text-data text-ink font-medium">
+            Entry #{entry.entryNumber}
+          </span>
+          {entry.isBalanced ? (
+            <span className="flex items-center gap-1 font-sans text-[10px] uppercase tracking-wide text-green-600">
+              <CheckCircle2 className="w-3 h-3" />
+              Balanced
+            </span>
+          ) : (
+            <span className="flex items-center gap-1 font-sans text-[10px] uppercase tracking-wide text-accounting-red">
+              <AlertCircle className="w-3 h-3" />
+              Unbalanced
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="font-mono text-micro text-text-secondary">
+            Dr {formatCurrency(entry.totalDebit)} · Cr {formatCurrency(entry.totalCredit)}
+          </span>
+          <button
+            onClick={() => onDeleteEntry(entry.id)}
+            className="p-1.5 text-muted hover:text-accounting-red transition-colors"
+            title="Delete entry"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Lines */}
+      <div>
+        {entry.lines.map((line, index) => (
+          <EditableRow
+            key={line.id}
+            line={line}
+            isFirstRow={index === 0}
+            onUpdate={(lineId, updates) => onUpdateLine(entry.id, lineId, updates)}
+            onDelete={(lineId) => onDeleteLine(entry.id, lineId)}
+            onAddLine={() => onAddLine(entry.id)}
+          />
+        ))}
+      </div>
+
+      {/* Add Line */}
+      <div className="px-3 py-2 border-t border-guide bg-ivory/50">
+        <button
+          onClick={() => onAddLine(entry.id)}
+          className="flex items-center gap-1.5 px-3 py-1.5 font-mono text-[11px] text-text-secondary hover:text-ink transition-colors"
+        >
+          <Plus className="w-3 h-3" />
+          Add line
+        </button>
+      </div>
+    </div>
+  );
+};
+
+/* ─────────────────── Main Journal Component ─────────────────── */
+
 export const JournalEntry = () => {
   const {
     currentWorkbook,
-    currentEntry,
     currentWorkbookId,
     addJournalLine,
     updateJournalLine,
     deleteJournalLine,
+    deleteJournalEntry,
     createJournalEntry,
     setCurrentEntryId,
   } = useLedgerContext();
 
   const headerRef = useRef<HTMLDivElement>(null);
-  const tableRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
-
-  // Create initial entry if none exists
-  useEffect(() => {
-    if (currentWorkbookId && currentWorkbook && currentWorkbook.entries.length === 0) {
-      const entryId = createJournalEntry(currentWorkbookId);
-      setCurrentEntryId(entryId);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentWorkbookId, currentWorkbook]);
 
   // Entrance animation
   useEffect(() => {
@@ -159,40 +276,57 @@ export const JournalEntry = () => {
         { opacity: 0, y: -30 },
         { opacity: 1, y: 0, duration: 0.5 }
       )
-      .fromTo(tableRef.current,
-        { opacity: 0, y: 40, scale: 0.985 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.6 },
-        '-=0.3'
-      )
-      .fromTo(footerRef.current,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.4 },
-        '-=0.3'
-      );
+        .fromTo(contentRef.current,
+          { opacity: 0, y: 40, scale: 0.985 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.6 },
+          '-=0.3'
+        );
+
+      if (footerRef.current) {
+        tl.fromTo(footerRef.current,
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: 0.4 },
+          '-=0.3'
+        );
+      }
     });
 
     return () => ctx.revert();
   }, []);
 
-  const handleUpdateLine = useCallback((lineId: string, updates: Partial<JournalEntryLine>) => {
-    if (currentWorkbookId && currentEntry) {
-      updateJournalLine(currentWorkbookId, currentEntry.id, lineId, updates);
+  const handleUpdateLine = useCallback((entryId: string, lineId: string, updates: Partial<JournalEntryLine>) => {
+    if (currentWorkbookId) {
+      updateJournalLine(currentWorkbookId, entryId, lineId, updates);
     }
-  }, [currentWorkbookId, currentEntry, updateJournalLine]);
+  }, [currentWorkbookId, updateJournalLine]);
 
-  const handleDeleteLine = useCallback((lineId: string) => {
-    if (currentWorkbookId && currentEntry) {
-      deleteJournalLine(currentWorkbookId, currentEntry.id, lineId);
+  const handleDeleteLine = useCallback((entryId: string, lineId: string) => {
+    if (currentWorkbookId) {
+      deleteJournalLine(currentWorkbookId, entryId, lineId);
     }
-  }, [currentWorkbookId, currentEntry, deleteJournalLine]);
+  }, [currentWorkbookId, deleteJournalLine]);
 
-  const handleAddLine = useCallback(() => {
-    if (currentWorkbookId && currentEntry) {
-      addJournalLine(currentWorkbookId, currentEntry.id);
+  const handleAddLine = useCallback((entryId: string) => {
+    if (currentWorkbookId) {
+      addJournalLine(currentWorkbookId, entryId);
     }
-  }, [currentWorkbookId, currentEntry, addJournalLine]);
+  }, [currentWorkbookId, addJournalLine]);
 
-  if (!currentWorkbook || !currentEntry) {
+  const handleDeleteEntry = useCallback((entryId: string) => {
+    if (currentWorkbookId) {
+      deleteJournalEntry(currentWorkbookId, entryId);
+    }
+  }, [currentWorkbookId, deleteJournalEntry]);
+
+  const handleNewEntry = useCallback(() => {
+    if (currentWorkbookId) {
+      const entryId = createJournalEntry(currentWorkbookId);
+      setCurrentEntryId(entryId);
+    }
+  }, [currentWorkbookId, createJournalEntry, setCurrentEntryId]);
+
+  // ── No workbook selected ──
+  if (!currentWorkbook) {
     return (
       <section className="min-h-screen pt-32 pb-16 px-[8vw] flex items-center justify-center">
         <div className="text-center">
@@ -204,134 +338,149 @@ export const JournalEntry = () => {
     );
   }
 
-  const entry = currentEntry;
-  const totals = {
-    debit: entry.totalDebit,
-    credit: entry.totalCredit,
-    diff: Math.abs(entry.totalDebit - entry.totalCredit),
-    isBalanced: entry.isBalanced,
-  };
+  // ── Workbook exists but no entries yet ──
+  if (currentWorkbook.entries.length === 0) {
+    return (
+      <section className="min-h-screen pt-32 pb-16 px-[8vw] flex items-center justify-center">
+        <div className="text-center space-y-6">
+          <div className="w-20 h-20 rounded-full bg-ivory border-2 border-guide flex items-center justify-center mx-auto">
+            <BookOpen className="w-8 h-8 text-text-secondary" />
+          </div>
+          <div>
+            <h2 className="font-display text-heading text-ink mb-2">
+              Your journal is empty
+            </h2>
+            <p className="font-serif text-body text-text-secondary max-w-md">
+              Start recording your double-entry transactions. Each journal entry captures debits and credits that flow into the ledger.
+            </p>
+          </div>
+          <button
+            onClick={handleNewEntry}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-accounting-red text-white font-sans text-label uppercase tracking-wide rounded-paper hover:bg-accounting-red/90 transition-colors shadow-sm"
+          >
+            <FileText className="w-4 h-4" />
+            Register First Entry
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  // ── Full Journal View ──
+  const entries = currentWorkbook.entries;
+  const totalDebit = entries.reduce((s, e) => s + e.totalDebit, 0);
+  const totalCredit = entries.reduce((s, e) => s + e.totalCredit, 0);
+  const allBalanced = entries.every(e => e.isBalanced);
 
   return (
-    <section className="min-h-screen pt-28 pb-8 px-[8vw]">
+    <section id="journal-view" className="min-h-screen pt-28 pb-8 px-[8vw]">
       {/* Header */}
-      <div ref={headerRef} className="flex items-end justify-between mb-6">
+      <div ref={headerRef} className="flex flex-col md:flex-row items-start md:items-end justify-between mb-6 gap-4">
         <div>
           <h1 className="font-display text-display text-ink tracking-tight">
             General Journal
           </h1>
           <p className="font-serif text-body text-text-secondary mt-1">
-            Record double-entry transactions with precision
+            Record and manage double-entry transactions
           </p>
         </div>
-        <div className="font-mono text-data text-text-secondary">
-          Entry #{entry.entryNumber} • {formatShortDate(entry.date)}
-        </div>
-      </div>
-
-      {/* Table */}
-      <div 
-        ref={tableRef} 
-        className="border border-guide rounded-paper bg-surface overflow-hidden"
-      >
-        {/* Table Header */}
-        <div className="grid grid-cols-[100px_1fr_60px_120px_120px_40px] gap-2 h-10 bg-ivory border-b border-guide items-center">
-          <div className="px-2 font-sans text-label uppercase tracking-wide text-text-secondary">
-            Date
-          </div>
-          <div className="px-2 font-sans text-label uppercase tracking-wide text-text-secondary">
-            Details
-          </div>
-          <div className="px-2 font-sans text-label uppercase tracking-wide text-text-secondary text-center">
-            Ref
-          </div>
-          <div className="px-2 font-sans text-label uppercase tracking-wide text-text-secondary text-right">
-            Debit
-          </div>
-          <div className="px-2 font-sans text-label uppercase tracking-wide text-text-secondary text-right">
-            Credit
-          </div>
-          <div />
-        </div>
-
-        {/* Table Body */}
-        <div className="min-h-[320px]">
-          {entry.lines.map((line, index) => (
-            <EditableRow
-              key={line.id}
-              line={line}
-              isFirstRow={index === 0}
-              onUpdate={handleUpdateLine}
-              onDelete={handleDeleteLine}
-              onAddLine={handleAddLine}
-            />
-          ))}
-        </div>
-
-        {/* Add Line Button */}
-        <div className="p-3 border-t border-guide bg-ivory">
+        <div className="flex items-center gap-3">
+          <span className="font-mono text-data text-text-secondary">
+            {entries.length} {entries.length === 1 ? 'entry' : 'entries'}
+          </span>
+          <Button
+            variant="outline"
+            className="gap-2 font-serif"
+            onClick={() => downloadAsImage('journal-view', 'general-journal')}
+          >
+            <Download className="w-4 h-4" />
+            Download Image
+          </Button>
           <button
-            onClick={handleAddLine}
-            className="flex items-center gap-2 px-4 py-2 font-mono text-data text-text-secondary hover:text-ink transition-colors"
+            onClick={handleNewEntry}
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-accounting-red text-white font-sans text-[11px] uppercase tracking-wide rounded-paper hover:bg-accounting-red/90 transition-colors"
           >
             <Plus className="w-4 h-4" />
-            Add line
+            New Entry
           </button>
         </div>
       </div>
 
-      {/* Balance Bar */}
-      <div 
+      {/* Table Header (sticky columns labels) */}
+      <div ref={contentRef} className="space-y-3">
+        <div className="grid grid-cols-[80px_1fr_60px_110px_110px_36px] gap-1 h-9 bg-ink text-ivory items-center rounded-t-paper px-0">
+          <div className="px-2 font-sans text-[10px] uppercase tracking-wide">Date</div>
+          <div className="px-2 font-sans text-[10px] uppercase tracking-wide">Details</div>
+          <div className="px-2 font-sans text-[10px] uppercase tracking-wide text-center">Ref</div>
+          <div className="px-2 font-sans text-[10px] uppercase tracking-wide text-right">Debit</div>
+          <div className="px-2 font-sans text-[10px] uppercase tracking-wide text-right">Credit</div>
+          <div />
+        </div>
+
+        {/* Entry Blocks */}
+        {entries.map((entry) => (
+          <EntryBlock
+            key={entry.id}
+            entry={entry}
+            workbookId={currentWorkbookId!}
+            onUpdateLine={handleUpdateLine}
+            onDeleteLine={handleDeleteLine}
+            onAddLine={handleAddLine}
+            onDeleteEntry={handleDeleteEntry}
+          />
+        ))}
+      </div>
+
+      {/* Grand Totals Bar */}
+      <div
         ref={footerRef}
-        className={`mt-4 p-4 rounded-paper border transition-all ${
-          totals.isBalanced
+        className={`mt-4 p-4 rounded-paper border transition-all ${allBalanced
             ? 'bg-ivory border-guide'
             : 'bg-pale-red border-accounting-red/30'
-        }`}
+          }`}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-8">
             <div className="flex items-center gap-3">
               <span className="font-sans text-label uppercase tracking-wide text-text-secondary">
-                Debit
+                Total Debit
               </span>
               <span className="font-mono text-data text-ink tabular-nums">
-                {formatCurrency(totals.debit)}
+                {formatCurrency(totalDebit)}
               </span>
             </div>
             <div className="flex items-center gap-3">
               <span className="font-sans text-label uppercase tracking-wide text-text-secondary">
-                Credit
+                Total Credit
               </span>
               <span className="font-mono text-data text-ink tabular-nums">
-                {formatCurrency(totals.credit)}
+                {formatCurrency(totalCredit)}
               </span>
             </div>
             <div className="flex items-center gap-3">
               <span className="font-sans text-label uppercase tracking-wide text-text-secondary">
                 Diff
               </span>
-              <span className={`font-mono text-data tabular-nums ${
-                totals.diff > 0 ? 'text-accounting-red' : 'text-green-600'
-              }`}>
-                {formatCurrency(totals.diff)}
+              <span className={`font-mono text-data tabular-nums ${Math.abs(totalDebit - totalCredit) > 0.001 ? 'text-accounting-red' : 'text-green-600'
+                }`}>
+                {formatCurrency(Math.abs(totalDebit - totalCredit))}
               </span>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            {totals.isBalanced ? (
+            {allBalanced ? (
               <>
                 <CheckCircle2 className="w-5 h-5 text-green-600" />
                 <span className="font-sans text-label uppercase tracking-wide text-green-600">
-                  Balanced
+                  All Balanced
                 </span>
               </>
             ) : (
               <>
                 <AlertCircle className="w-5 h-5 text-accounting-red" />
                 <span className="font-sans text-label uppercase tracking-wide text-accounting-red">
-                  Unbalanced
+                  Unbalanced Entries
                 </span>
               </>
             )}
@@ -339,17 +488,22 @@ export const JournalEntry = () => {
         </div>
       </div>
 
-      {/* Instructions */}
+      {/* Explanation */}
       <div className="mt-8 p-4 border border-guide rounded-paper bg-ivory/50">
         <h3 className="font-sans text-label uppercase tracking-wide text-text-secondary mb-2">
-          How to record
+          About the General Journal
         </h3>
+        <p className="font-serif text-body text-text-secondary mb-3">
+          The general journal is the book of original entry where all business transactions are first recorded
+          in chronological order. Each entry must follow the double-entry principle: total debits must equal
+          total credits.
+        </p>
         <ul className="font-serif text-body text-text-secondary space-y-1 list-disc list-inside">
           <li>Enter the date on the first line (DD/MM format)</li>
-          <li>Type the account name in Details</li>
-          <li>Enter the amount in either Debit or Credit column</li>
-          <li>Credit entries are automatically indented</li>
-          <li>Press Enter or click "Add line" for additional lines</li>
+          <li>Type the account name in Details — debit accounts listed first</li>
+          <li>Credit accounts are automatically indented</li>
+          <li>Press Enter to quickly add a new line</li>
+          <li>Use the <strong>New Entry</strong> button for each separate transaction</li>
         </ul>
       </div>
     </section>
