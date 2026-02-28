@@ -170,7 +170,6 @@ const EditableRow = ({
 
 interface EntryBlockProps {
   entry: JournalEntryType;
-  workbookId: string;
   onUpdateLine: (entryId: string, lineId: string, updates: Partial<JournalEntryLine>) => void;
   onDeleteLine: (entryId: string, lineId: string) => void;
   onAddLine: (entryId: string) => void;
@@ -179,7 +178,6 @@ interface EntryBlockProps {
 
 const EntryBlock = ({
   entry,
-  workbookId,
   onUpdateLine,
   onDeleteLine,
   onAddLine,
@@ -422,7 +420,6 @@ export const JournalEntry = () => {
           <EntryBlock
             key={entry.id}
             entry={entry}
-            workbookId={currentWorkbookId!}
             onUpdateLine={handleUpdateLine}
             onDeleteLine={handleDeleteLine}
             onAddLine={handleAddLine}
@@ -435,8 +432,8 @@ export const JournalEntry = () => {
       <div
         ref={footerRef}
         className={`mt-4 p-4 rounded-paper border transition-all ${allBalanced
-            ? 'bg-ivory border-guide'
-            : 'bg-pale-red border-accounting-red/30'
+          ? 'bg-ivory border-guide'
+          : 'bg-pale-red border-accounting-red/30'
           }`}
       >
         <div className="flex items-center justify-between">
