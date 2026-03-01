@@ -20,31 +20,68 @@ const DateInput = ({
   onFocus: () => void;
   onBlur: () => void;
 }) => {
-  // Display raw DD/MM strings, or format ISO dates
   const displayValue = value ? formatShortDate(value) : '';
+  const parts = displayValue.split('/');
+  const day = parts[0] || '';
+  const month = parts[1] || '';
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let raw = e.target.value.replace(/[^0-9/]/g, '');
-    // Auto-insert slash after 2 digits
-    if (raw.length === 2 && !raw.includes('/')) {
-      raw += '/';
-    }
-    // Max length DD/MM = 5 chars
-    if (raw.length > 5) raw = raw.slice(0, 5);
-    onChange(raw);
+  const getDaysInMonth = (m: number) => {
+    if (m === 2) return 28;
+    if ([4, 6, 9, 11].includes(m)) return 30;
+    return 31;
   };
 
+  const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newMonth = e.target.value;
+    let currentDayStr = day || '01';
+    let currentDayInt = parseInt(currentDayStr, 10);
+
+    const maxDays = getDaysInMonth(parseInt(newMonth, 10));
+    if (currentDayInt > maxDays) {
+      currentDayStr = maxDays.toString().padStart(2, '0');
+    }
+    onChange(`${currentDayStr}/${newMonth}`);
+  };
+
+  const handleDayChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newDay = e.target.value;
+    const currentMonthStr = month || (new Date().getMonth() + 1).toString().padStart(2, '0');
+    onChange(`${newDay}/${currentMonthStr}`);
+  };
+
+  const currentMonthInt = parseInt(month, 10) || (new Date().getMonth() + 1);
+  const maxDays = getDaysInMonth(currentMonthInt);
+
   return (
-    <input
-      type="text"
-      value={displayValue}
-      onChange={handleChange}
+    <div
+      className="flex items-center"
       onFocus={onFocus}
       onBlur={onBlur}
-      placeholder="DD/MM"
-      maxLength={5}
-      className="w-full bg-transparent font-mono text-data text-ink placeholder:text-muted outline-none"
-    />
+    >
+      <select
+        value={day}
+        onChange={handleDayChange}
+        className="bg-transparent font-mono text-data text-ink outline-none cursor-pointer appearance-none text-center hover:text-ink/70"
+      >
+        <option value="" disabled>DD</option>
+        {Array.from({ length: maxDays }, (_, i) => {
+          const d = (i + 1).toString().padStart(2, '0');
+          return <option key={d} value={d}>{d}</option>;
+        })}
+      </select>
+      <span className="font-mono text-data text-muted">/</span>
+      <select
+        value={month}
+        onChange={handleMonthChange}
+        className="bg-transparent font-mono text-data text-ink outline-none cursor-pointer appearance-none text-center hover:text-ink/70"
+      >
+        <option value="" disabled>MM</option>
+        {Array.from({ length: 12 }, (_, i) => {
+          const m = (i + 1).toString().padStart(2, '0');
+          return <option key={m} value={m}>{m}</option>;
+        })}
+      </select>
+    </div>
   );
 };
 
