@@ -31,6 +31,8 @@ const DateInput = ({
     return 31;
   };
 
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
   const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newMonth = e.target.value;
     let currentDayStr = day || '01';
@@ -54,31 +56,30 @@ const DateInput = ({
 
   return (
     <div
-      className="flex items-center"
+      className="flex items-center gap-1.5"
       onFocus={onFocus}
       onBlur={onBlur}
     >
       <select
+        value={month}
+        onChange={handleMonthChange}
+        className="bg-transparent font-sans text-[13px] font-medium uppercase tracking-wide text-ink outline-none cursor-pointer appearance-none text-left hover:text-ink/70"
+      >
+        <option value="" disabled>MMM</option>
+        {monthNames.map((m, i) => {
+          const val = (i + 1).toString().padStart(2, '0');
+          return <option key={val} value={val}>{m}</option>;
+        })}
+      </select>
+      <select
         value={day}
         onChange={handleDayChange}
-        className="bg-transparent font-mono text-data text-ink outline-none cursor-pointer appearance-none text-center hover:text-ink/70"
+        className="bg-transparent font-mono text-sm text-ink outline-none cursor-pointer appearance-none text-center hover:text-ink/70 min-w-[24px]"
       >
         <option value="" disabled>DD</option>
         {Array.from({ length: maxDays }, (_, i) => {
           const d = (i + 1).toString().padStart(2, '0');
           return <option key={d} value={d}>{d}</option>;
-        })}
-      </select>
-      <span className="font-mono text-data text-muted">/</span>
-      <select
-        value={month}
-        onChange={handleMonthChange}
-        className="bg-transparent font-mono text-data text-ink outline-none cursor-pointer appearance-none text-center hover:text-ink/70"
-      >
-        <option value="" disabled>MM</option>
-        {Array.from({ length: 12 }, (_, i) => {
-          const m = (i + 1).toString().padStart(2, '0');
-          return <option key={m} value={m}>{m}</option>;
         })}
       </select>
     </div>
