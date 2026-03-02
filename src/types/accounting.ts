@@ -176,6 +176,7 @@ export interface Workbook {
 export type ViewMode =
   | 'dashboard'
   | 'learning'
+  | 'journal-learning'
   | 'journal'
   | 'ledger'
   | 'trial-balance'

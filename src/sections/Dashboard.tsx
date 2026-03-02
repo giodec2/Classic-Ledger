@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { useLedgerContext } from '@/hooks/LedgerContext';
-import { Plus, BookOpen, Trash2, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Plus, BookOpen, Trash2, Clock, CheckCircle2, AlertCircle, FileText } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -84,17 +84,30 @@ export const Dashboard = () => {
             </p>
 
             {/* Learn Section Entry Point */}
-            <div ref={dateRef} className="pt-2">
+            <div ref={dateRef} className="pt-2 flex flex-col gap-3">
               <button
                 onClick={() => setCurrentView('learning')}
-                className="inline-flex items-center gap-2 px-5 py-3 bg-surface border border-guide rounded-paper hover:border-orange-400 text-text-secondary transition-all group shadow-sm hover:shadow-md"
+                className="inline-flex items-center gap-3 px-5 py-3 bg-surface border border-guide rounded-paper hover:border-orange-400 text-text-secondary transition-all group shadow-sm hover:shadow-md w-full max-w-sm"
               >
-                <div className="w-8 h-8 rounded-full bg-ink/5 flex items-center justify-center group-hover:bg-orange-500 group-hover:text-white transition-colors">
+                <div className="w-8 h-8 rounded-full bg-ink/5 flex items-center justify-center group-hover:bg-orange-500 group-hover:text-white transition-colors shrink-0">
                   <BookOpen className="w-4 h-4" />
                 </div>
                 <div className="text-left leading-tight">
                   <span className="block font-sans text-label uppercase tracking-wide group-hover:text-orange-600 transition-colors text-ink">Learn Basics</span>
                   <span className="block font-serif text-[13px] text-text-secondary group-hover:text-orange-600/80 transition-colors">Accounting 101 guide</span>
+                </div>
+              </button>
+
+              <button
+                onClick={() => setCurrentView('journal-learning')}
+                className="inline-flex items-center gap-3 px-5 py-3 bg-surface border border-guide rounded-paper hover:border-blue-400 text-text-secondary transition-all group shadow-sm hover:shadow-md w-full max-w-sm"
+              >
+                <div className="w-8 h-8 rounded-full bg-ink/5 flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition-colors shrink-0">
+                  <FileText className="w-4 h-4" />
+                </div>
+                <div className="text-left leading-tight">
+                  <span className="block font-sans text-label uppercase tracking-wide group-hover:text-blue-600 transition-colors text-ink">Journal Entries</span>
+                  <span className="block font-serif text-[13px] text-text-secondary group-hover:text-blue-600/80 transition-colors">Deep dive into Dr & Cr</span>
                 </div>
               </button>
             </div>

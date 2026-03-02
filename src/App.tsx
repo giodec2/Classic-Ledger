@@ -18,6 +18,7 @@ import type { User } from '@supabase/supabase-js';
 import './App.css';
 
 import { LearningView } from '@/sections/LearningView';
+import { JournalLearningView } from '@/sections/JournalLearningView';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -61,6 +62,7 @@ function AppContent({ user }: { user: User }) {
           </>
         )}
         {currentView === 'learning' && <LearningView />}
+        {currentView === 'journal-learning' && <JournalLearningView />}
         {currentView === 'journal' && <JournalEntry />}
         {currentView === 'ledger' && <TAccountLedger />}
         {currentView === 'trial-balance' && <TrialBalance />}
