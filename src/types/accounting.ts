@@ -177,6 +177,7 @@ export type ViewMode =
   | 'dashboard'
   | 'learning'
   | 'journal-learning'
+  | 'adjusting-learning'
   | 'journal'
   | 'ledger'
   | 'trial-balance'

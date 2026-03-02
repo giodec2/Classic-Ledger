@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { useLedgerContext } from '@/hooks/LedgerContext';
-import { Plus, BookOpen, Trash2, Clock, CheckCircle2, AlertCircle, FileText } from 'lucide-react';
+import { Plus, BookOpen, Trash2, Clock, CheckCircle2, AlertCircle, FileText, Settings2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -108,6 +108,19 @@ export const Dashboard = () => {
                 <div className="text-left leading-tight">
                   <span className="block font-sans text-label uppercase tracking-wide group-hover:text-blue-600 transition-colors text-ink">Journal Entries</span>
                   <span className="block font-serif text-[13px] text-text-secondary group-hover:text-blue-600/80 transition-colors">Deep dive into Dr & Cr</span>
+                </div>
+              </button>
+
+              <button
+                onClick={() => setCurrentView('adjusting-learning')}
+                className="inline-flex items-center gap-3 px-5 py-3 bg-surface border border-guide rounded-paper hover:border-emerald-400 text-text-secondary transition-all group shadow-sm hover:shadow-md w-full max-w-sm"
+              >
+                <div className="w-8 h-8 rounded-full bg-ink/5 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-colors shrink-0">
+                  <Settings2 className="w-4 h-4" />
+                </div>
+                <div className="text-left leading-tight">
+                  <span className="block font-sans text-label uppercase tracking-wide group-hover:text-emerald-600 transition-colors text-ink">Adjusting Entries</span>
+                  <span className="block font-serif text-[13px] text-text-secondary group-hover:text-emerald-600/80 transition-colors">Accruals & Deferrals</span>
                 </div>
               </button>
             </div>

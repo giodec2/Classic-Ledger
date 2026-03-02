@@ -19,6 +19,7 @@ import './App.css';
 
 import { LearningView } from '@/sections/LearningView';
 import { JournalLearningView } from '@/sections/JournalLearningView';
+import { AdjustingJournalLearningView } from '@/sections/AdjustingJournalLearningView';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -63,6 +64,7 @@ function AppContent({ user }: { user: User }) {
         )}
         {currentView === 'learning' && <LearningView />}
         {currentView === 'journal-learning' && <JournalLearningView />}
+        {currentView === 'adjusting-learning' && <AdjustingJournalLearningView />}
         {currentView === 'journal' && <JournalEntry />}
         {currentView === 'ledger' && <TAccountLedger />}
         {currentView === 'trial-balance' && <TrialBalance />}
