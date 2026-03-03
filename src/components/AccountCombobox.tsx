@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { ChevronDown, Plus } from 'lucide-react';
 
 // Standard chart of accounts organised by category
@@ -83,7 +82,6 @@ export const AccountCombobox = ({
 }: AccountComboboxProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState('');
-    const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 288 });
     const inputRef = useRef<HTMLInputElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -151,17 +149,7 @@ export const AccountCombobox = ({
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [onBlur]);
 
-    // Update dropdown position when open
-    useEffect(() => {
-        if (isOpen && containerRef.current) {
-            const rect = containerRef.current.getBoundingClientRect();
-            setDropdownPos({
-                top: rect.bottom + 4,
-                left: rect.left,
-                width: 180,
-            });
-        }
-    }, [isOpen]);
+
 
     const handleSelect = (accountName: string) => {
         onChange(accountName);
@@ -226,11 +214,11 @@ export const AccountCombobox = ({
                 </button>
             </div>
 
-            {isOpen && createPortal(
+            {isOpen && (
                 <div
                     ref={dropdownRef}
-                    style={{ position: 'fixed', top: dropdownPos.top, left: dropdownPos.left, width: dropdownPos.width }}
-                    className="max-h-80 overflow-y-auto bg-surface border border-guide rounded-paper shadow-xl z-[9999]"
+                    style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '4px' }}
+                    className="max-h-60 overflow-y-auto bg-surface border border-guide rounded-paper shadow-xl z-[9999]"
                 >
 
                     {showCreateOption && (
@@ -290,8 +278,7 @@ export const AccountCombobox = ({
                             <span className="font-serif text-[13px] text-muted">No accounts found</span>
                         </div>
                     )}
-                </div>,
-                document.body
+                </div>
             )}
         </div>
     );
