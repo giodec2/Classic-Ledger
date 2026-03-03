@@ -214,6 +214,58 @@ export const useLedger = (userId?: string) => {
     return newEntry.id;
   }, [markDirty]);
 
+  const createFastJournalEntry = useCallback((
+    workbookId: string,
+    date: string,
+    debitAccount: string,
+    creditAccount: string,
+    amount: number,
+    description: string = ''
+  ): string => {
+    const newEntry: JournalEntry = {
+      id: generateId(),
+      entryNumber: 0,
+      date: new Date().toISOString(),
+      description,
+      lines: [
+        {
+          id: generateId(),
+          date,
+          description: debitAccount,
+          reference: '',
+          debit: amount,
+          credit: null,
+        },
+        {
+          id: generateId(),
+          date: '',
+          description: creditAccount,
+          reference: '',
+          debit: null,
+          credit: amount,
+        },
+      ],
+      isBalanced: true,
+      totalDebit: amount,
+      totalCredit: amount,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    markDirty(workbookId, prev => prev.map(wb => {
+      if (wb.id !== workbookId) return wb;
+      const entryNumber = wb.entries.length + 1;
+      const entryWithNumber = { ...newEntry, entryNumber };
+      return {
+        ...wb,
+        entries: [...wb.entries, entryWithNumber],
+        updatedAt: new Date(),
+      };
+    }));
+
+    return newEntry.id;
+  }, [markDirty]);
+
   const updateJournalEntry = useCallback((workbookId: string, entryId: string, updates: Partial<JournalEntry>) => {
     markDirty(workbookId, prev => prev.map(wb => {
       if (wb.id !== workbookId) return wb;
@@ -383,7 +435,7 @@ export const useLedger = (userId?: string) => {
             id: generateId(),
             journalEntryId: entry.id,
             journalEntryNumber: entry.entryNumber,
-            date: entry.date,
+            date: entry.lines[0]?.date || entry.date,
             amount: line.debit,
             description: entry.description || `Entry #${entry.entryNumber}`,
           });
@@ -395,7 +447,7 @@ export const useLedger = (userId?: string) => {
             id: generateId(),
             journalEntryId: entry.id,
             journalEntryNumber: entry.entryNumber,
-            date: entry.date,
+            date: entry.lines[0]?.date || entry.date,
             amount: line.credit,
             description: entry.description || `Entry #${entry.entryNumber}`,
           });
@@ -744,6 +796,7 @@ export const useLedger = (userId?: string) => {
     deleteWorkbook,
     selectWorkbook,
     createJournalEntry,
+    createFastJournalEntry,
     updateJournalEntry,
     deleteJournalEntry,
     addJournalLine,

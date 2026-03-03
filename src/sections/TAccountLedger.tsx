@@ -2,20 +2,33 @@ import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { Plus } from 'lucide-react';
 import { useLedgerContext } from '@/hooks/LedgerContext';
-import { formatCurrency, type TAccount, type TAccountEntry } from '@/types/accounting';
+import { formatCurrency, formatShortDate, type TAccount, type TAccountEntry } from '@/types/accounting';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AccountCombobox } from '@/components/AccountCombobox';
+import { DateInput } from '@/components/JournalComponents';
+import { Input } from '@/components/ui/input';
 
 interface TAccountCardProps {
   account: TAccount;
   onEntryClick: (entry: TAccountEntry) => void;
+  onAddClick: (accountName: string) => void;
 }
 
-const TAccountCard = ({ account, onEntryClick }: TAccountCardProps) => {
+const TAccountCard = ({ account, onEntryClick, onAddClick }: TAccountCardProps) => {
   return (
-    <div className="bg-surface border border-guide rounded-paper overflow-hidden">
+    <div className="bg-surface border border-guide rounded-paper overflow-hidden relative group">
+      {/* Action Button */}
+      <button
+        onClick={() => onAddClick(account.accountName)}
+        className="absolute top-2 right-2 p-1.5 opacity-0 group-hover:opacity-100 transition-opacity bg-ink text-white rounded-full hover:bg-ink/80 shadow-sm"
+        title="Record Transaction"
+      >
+        <Plus className="w-3.5 h-3.5" />
+      </button>
+
       {/* Header */}
       <div className="px-4 py-3 border-b border-ink bg-ivory">
-        <h3 className="font-serif text-heading text-ink text-center">
+        <h3 className="font-serif text-heading text-ink text-center flex items-center justify-center gap-2">
           {account.accountName}
         </h3>
         <p className="font-mono text-micro text-text-secondary text-center mt-1">
@@ -39,7 +52,7 @@ const TAccountCard = ({ account, onEntryClick }: TAccountCardProps) => {
               >
                 <div className="flex justify-between items-center">
                   <span className="font-mono text-micro text-text-secondary">
-                    {new Date(entry.date).toLocaleDateString('en-GB')}
+                    {formatShortDate(entry.date)}
                   </span>
                   <span className="font-mono text-data text-ink tabular-nums">
                     {formatCurrency(entry.amount)}
@@ -69,7 +82,7 @@ const TAccountCard = ({ account, onEntryClick }: TAccountCardProps) => {
               >
                 <div className="flex justify-between items-center">
                   <span className="font-mono text-micro text-text-secondary">
-                    {new Date(entry.date).toLocaleDateString('en-GB')}
+                    {formatShortDate(entry.date)}
                   </span>
                   <span className="font-mono text-data text-ink tabular-nums">
                     {formatCurrency(entry.amount)}
@@ -103,9 +116,43 @@ const TAccountCard = ({ account, onEntryClick }: TAccountCardProps) => {
 };
 
 export const TAccountLedger = () => {
-  const { currentWorkbook, currentWorkbookId, generateTAccounts, createJournalEntry, setCurrentEntryId, setCurrentView } = useLedgerContext();
+  const { currentWorkbook, currentWorkbookId, generateTAccounts, createFastJournalEntry } = useLedgerContext();
   const [accounts, setAccounts] = useState<TAccount[]>([]);
   const [selectedEntry, setSelectedEntry] = useState<TAccountEntry | null>(null);
+
+  // Fast Transaction Dialog State
+  const [isFastTxOpen, setIsFastTxOpen] = useState(false);
+  const [txDate, setTxDate] = useState('');
+  const [txPrimaryAccount, setTxPrimaryAccount] = useState('');
+  const [txOffsetAccount, setTxOffsetAccount] = useState('');
+  const [txAmount, setTxAmount] = useState('');
+  const [txIsDebit, setTxIsDebit] = useState(true);
+  const [txDescription, setTxDescription] = useState('');
+
+  const handleOpenFastTx = (accountName: string = '') => {
+    setTxPrimaryAccount(accountName);
+    setTxOffsetAccount('');
+    setTxAmount('');
+    setTxDate('');
+    setTxIsDebit(true);
+    setTxDescription('');
+    setIsFastTxOpen(true);
+  };
+
+  const handleSubmitFastTx = () => {
+    if (!currentWorkbookId || !txDate || !txPrimaryAccount || !txOffsetAccount || !txAmount || parseFloat(txAmount) <= 0) return;
+
+    let debitAcc = txPrimaryAccount;
+    let creditAcc = txOffsetAccount;
+
+    if (!txIsDebit) {
+      debitAcc = txOffsetAccount;
+      creditAcc = txPrimaryAccount;
+    }
+
+    createFastJournalEntry(currentWorkbookId, txDate, debitAcc, creditAcc, parseFloat(txAmount), txDescription);
+    setIsFastTxOpen(false);
+  };
 
   const headerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -161,11 +208,7 @@ export const TAccountLedger = () => {
             T-accounts visualize the flow of value. They perfectly mirror the General Journal so any changes made there will update the T-accounts here automatically.
           </p>
           <button
-            onClick={() => {
-              const entryId = createJournalEntry(currentWorkbookId!);
-              setCurrentEntryId(entryId);
-              setCurrentView('journal');
-            }}
+            onClick={() => handleOpenFastTx()}
             className="flex items-center gap-1.5 px-4 py-2.5 bg-accounting-red text-white font-sans text-[11px] uppercase tracking-wide rounded-paper hover:bg-accounting-red/90 transition-colors"
           >
             <Plus className="w-4 h-4" />
@@ -182,11 +225,7 @@ export const TAccountLedger = () => {
               No accounts yet. Record journal entries to generate T-accounts.
             </p>
             <button
-              onClick={() => {
-                const entryId = createJournalEntry(currentWorkbookId!);
-                setCurrentEntryId(entryId);
-                setCurrentView('journal');
-              }}
+              onClick={() => handleOpenFastTx()}
               className="inline-flex items-center gap-2 px-6 py-3 bg-accounting-red text-white font-sans text-label uppercase tracking-wide rounded-paper hover:bg-accounting-red/90 transition-colors shadow-sm"
             >
               <Plus className="w-4 h-4" />
@@ -204,6 +243,7 @@ export const TAccountLedger = () => {
               key={account.id}
               account={account}
               onEntryClick={setSelectedEntry}
+              onAddClick={handleOpenFastTx}
             />
           ))}
         </div>
@@ -233,7 +273,7 @@ export const TAccountLedger = () => {
                     Date
                   </label>
                   <p className="font-mono text-data text-ink">
-                    {new Date(selectedEntry.date).toLocaleDateString('en-GB')}
+                    {formatShortDate(selectedEntry.date)}
                   </p>
                 </div>
               </div>
@@ -264,7 +304,135 @@ export const TAccountLedger = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Legend */}
+      {/* Fast Transaction Dialog */}
+      <Dialog open={isFastTxOpen} onOpenChange={setIsFastTxOpen}>
+        <DialogContent className="bg-surface border-ink/20 rounded-paper max-w-lg">
+          <DialogHeader className="mb-4">
+            <DialogTitle className="font-display text-heading text-ink flex items-center gap-2">
+              <span className="w-8 h-8 rounded bg-accounting-red/10 text-accounting-red flex items-center justify-center">
+                <Plus className="w-4 h-4" />
+              </span>
+              Record Transaction
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-5">
+            <div className="flex items-center gap-4">
+              <div className="w-32 shrink-0">
+                <label className="font-sans text-label uppercase tracking-wide text-text-secondary block mb-2">
+                  Date
+                </label>
+                <div className="h-10 flex items-center px-3 border border-guide rounded bg-white">
+                  <DateInput
+                    value={txDate}
+                    onChange={setTxDate}
+                    onFocus={() => { }}
+                    onBlur={() => { }}
+                  />
+                </div>
+              </div>
+              <div className="flex-1">
+                <label className="font-sans text-label uppercase tracking-wide text-text-secondary block mb-2">
+                  Amount
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-muted">$</span>
+                  <Input
+                    type="number"
+                    value={txAmount}
+                    onChange={(e) => setTxAmount(e.target.value)}
+                    className="pl-7 font-mono text-lg bg-white h-10 border-guide"
+                    placeholder="0.00"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 bg-guide/10 border border-guide rounded space-y-4">
+              <div className="flex items-center gap-4 border-b border-guide pb-4">
+                <div className="flex-1">
+                  <label className="font-sans text-label uppercase tracking-wide text-text-secondary block mb-2">
+                    Primary Account
+                  </label>
+                  <AccountCombobox
+                    value={txPrimaryAccount}
+                    onChange={setTxPrimaryAccount}
+                    existingAccounts={accounts.map(a => a.accountName)}
+                    placeholder="Select account"
+                    className="font-serif bg-white h-10 px-3 w-full border border-guide rounded"
+                    onFocus={() => { }} onBlur={() => { }} onKeyDown={() => { }}
+                  />
+                </div>
+                <div className="flex flex-col gap-2 shrink-0 pt-6">
+                  <div className="flex bg-white rounded border border-guide overflow-hidden">
+                    <button
+                      onClick={() => setTxIsDebit(true)}
+                      className={`px-4 py-1.5 font-sans text-xs uppercase tracking-wider font-bold transition-colors \${txIsDebit ? 'bg-ink text-white' : 'text-text-secondary hover:bg-guide/30'}`}
+                    >
+                      Debit
+                    </button>
+                    <button
+                      onClick={() => setTxIsDebit(false)}
+                      className={`px-4 py-1.5 font-sans text-xs uppercase tracking-wider font-bold transition-colors \${!txIsDebit ? 'bg-ink text-white' : 'text-text-secondary hover:bg-guide/30'}`}
+                    >
+                      Credit
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="font-sans text-label uppercase tracking-wide text-text-secondary block mb-2">
+                  Offsetting Account (Auto-Balances)
+                </label>
+                <div className="flex items-center gap-3">
+                  <span className={`px-2 py-1 bg-white font-sans text-[10px] font-bold uppercase rounded border border-guide \${txIsDebit ? 'text-red-600' : 'text-green-600'}`}>
+                    {txIsDebit ? 'CREDIT' : 'DEBIT'}
+                  </span>
+                  <div className="flex-1">
+                    <AccountCombobox
+                      value={txOffsetAccount}
+                      onChange={setTxOffsetAccount}
+                      existingAccounts={accounts.map(a => a.accountName)}
+                      placeholder="Select opposing account"
+                      className="font-serif bg-white h-10 px-3 w-full border border-guide rounded"
+                      onFocus={() => { }} onBlur={() => { }} onKeyDown={() => { }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="font-sans text-label uppercase tracking-wide text-text-secondary block mb-2">
+                Memo (Optional)
+              </label>
+              <Input
+                value={txDescription}
+                onChange={(e) => setTxDescription(e.target.value)}
+                placeholder="Description for the journal entry..."
+                className="font-serif bg-white border-guide"
+              />
+            </div>
+
+            <div className="flex justify-end pt-4 mt-6 border-t border-guide gap-3">
+              <button
+                onClick={() => setIsFastTxOpen(false)}
+                className="px-5 py-2.5 font-sans text-label uppercase tracking-wide text-text-secondary hover:bg-guide/30 rounded-paper transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmitFastTx}
+                disabled={!txDate || !txPrimaryAccount || !txOffsetAccount || !txAmount}
+                className="px-5 py-2.5 bg-ink text-white font-sans text-label uppercase tracking-wide rounded-paper hover:bg-ink/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Record Entry
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
       <div className="mt-8 p-4 border border-guide rounded-paper bg-ivory/50">
         <h3 className="font-sans text-label uppercase tracking-wide text-text-secondary mb-3">
           Understanding T-Accounts
