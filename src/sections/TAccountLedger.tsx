@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { Plus } from 'lucide-react';
 import { useLedgerContext } from '@/hooks/LedgerContext';
-import { formatCurrency, formatShortDate, type TAccount, type TAccountEntry } from '@/types/accounting';
+import { generateId, formatCurrency, formatShortDate, type TAccount, type TAccountEntry } from '@/types/accounting';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AccountCombobox } from '@/components/AccountCombobox';
 import { DateInput } from '@/components/JournalComponents';
@@ -116,23 +116,21 @@ const TAccountCard = ({ account, onEntryClick, onAddClick }: TAccountCardProps) 
 };
 
 export const TAccountLedger = () => {
-  const { currentWorkbook, currentWorkbookId, generateTAccounts, createFastJournalEntry } = useLedgerContext();
+  const { currentWorkbook, currentWorkbookId, generateTAccounts, addCompleteJournalEntry } = useLedgerContext();
   const [accounts, setAccounts] = useState<TAccount[]>([]);
   const [selectedEntry, setSelectedEntry] = useState<TAccountEntry | null>(null);
 
   // Fast Transaction Dialog State
   const [isFastTxOpen, setIsFastTxOpen] = useState(false);
   const [txDate, setTxDate] = useState('');
-  const [txPrimaryAccount, setTxPrimaryAccount] = useState('');
-  const [txOffsetAccount, setTxOffsetAccount] = useState('');
-  const [txAmount, setTxAmount] = useState('');
+  const [txPrimaryLines, setTxPrimaryLines] = useState([{ id: generateId(), accountName: '', amount: '' }]);
+  const [txOffsetLines, setTxOffsetLines] = useState([{ id: generateId(), accountName: '', amount: '' }]);
   const [txIsDebit, setTxIsDebit] = useState(true);
   const [txDescription, setTxDescription] = useState('');
 
   const handleOpenFastTx = (accountName: string = '') => {
-    setTxPrimaryAccount(accountName);
-    setTxOffsetAccount('');
-    setTxAmount('');
+    setTxPrimaryLines([{ id: generateId(), accountName, amount: '' }]);
+    setTxOffsetLines([{ id: generateId(), accountName: '', amount: '' }]);
     setTxDate('');
     setTxIsDebit(true);
     setTxDescription('');
@@ -140,17 +138,36 @@ export const TAccountLedger = () => {
   };
 
   const handleSubmitFastTx = () => {
-    if (!currentWorkbookId || !txDate || !txPrimaryAccount || !txOffsetAccount || !txAmount || parseFloat(txAmount) <= 0) return;
+    if (!currentWorkbookId || !txDate) return;
 
-    let debitAcc = txPrimaryAccount;
-    let creditAcc = txOffsetAccount;
+    const validPrimary = txPrimaryLines.filter(l => l.accountName && parseFloat(l.amount) > 0);
+    const validOffset = txOffsetLines.filter(l => l.accountName && parseFloat(l.amount) > 0);
 
-    if (!txIsDebit) {
-      debitAcc = txOffsetAccount;
-      creditAcc = txPrimaryAccount;
-    }
+    if (validPrimary.length === 0 || validOffset.length === 0) return;
 
-    createFastJournalEntry(currentWorkbookId, txDate, debitAcc, creditAcc, parseFloat(txAmount), txDescription);
+    const journalLines: any[] = [];
+
+    validPrimary.forEach(l => {
+      journalLines.push({
+        date: txDate, // Each line takes the entry date
+        description: l.accountName,
+        reference: '',
+        debit: txIsDebit ? parseFloat(l.amount) : null,
+        credit: !txIsDebit ? parseFloat(l.amount) : null,
+      });
+    });
+
+    validOffset.forEach(l => {
+      journalLines.push({
+        date: txDate,
+        description: l.accountName,
+        reference: '',
+        debit: !txIsDebit ? parseFloat(l.amount) : null,
+        credit: txIsDebit ? parseFloat(l.amount) : null,
+      });
+    });
+
+    addCompleteJournalEntry(currentWorkbookId, txDate, txDescription, journalLines);
     setIsFastTxOpen(false);
   };
 
@@ -331,38 +348,65 @@ export const TAccountLedger = () => {
                   />
                 </div>
               </div>
-              <div className="flex-1">
-                <label className="font-sans text-label uppercase tracking-wide text-text-secondary block mb-2">
-                  Amount
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-muted">$</span>
-                  <Input
-                    type="number"
-                    value={txAmount}
-                    onChange={(e) => setTxAmount(e.target.value)}
-                    className="pl-7 font-mono text-lg bg-white h-10 border-guide"
-                    placeholder="0.00"
-                  />
-                </div>
-              </div>
+              {/* The global Amount field is removed; amounts are now defined per line */}
             </div>
 
             <div className="p-4 bg-guide/10 border border-guide rounded space-y-4">
-              <div className="flex items-center gap-4 border-b border-guide pb-4">
-                <div className="flex-1">
-                  <label className="font-sans text-label uppercase tracking-wide text-text-secondary block mb-2">
-                    Primary Account
-                  </label>
-                  <AccountCombobox
-                    value={txPrimaryAccount}
-                    onChange={setTxPrimaryAccount}
-                    existingAccounts={accounts.map(a => a.accountName)}
-                    placeholder="Select account"
-                    className="font-serif bg-white h-10 px-3 w-full border border-guide rounded"
-                    onFocus={() => { }} onBlur={() => { }} onKeyDown={() => { }}
-                  />
+              <div className="flex items-start gap-4 border-b border-guide pb-4">
+                <div className="flex-1 space-y-3">
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="font-sans text-label uppercase tracking-wide text-text-secondary">
+                      Primary Account(s)
+                    </label>
+                  </div>
+                  {txPrimaryLines.map((line, idx) => (
+                    <div key={line.id} className="flex items-center gap-2">
+                      <div className="flex-1">
+                        <AccountCombobox
+                          value={line.accountName}
+                          onChange={(val) => {
+                            const newLines = [...txPrimaryLines];
+                            newLines[idx].accountName = val;
+                            setTxPrimaryLines(newLines);
+                          }}
+                          existingAccounts={accounts.map(a => a.accountName)}
+                          placeholder="Select account"
+                          className="font-serif bg-white h-10 px-3 w-full border border-guide rounded"
+                          onFocus={() => { }} onBlur={() => { }} onKeyDown={() => { }}
+                        />
+                      </div>
+                      <div className="w-28 relative shrink-0">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-muted text-sm">$</span>
+                        <Input
+                          type="number"
+                          value={line.amount}
+                          onChange={(e) => {
+                            const newLines = [...txPrimaryLines];
+                            newLines[idx].amount = e.target.value;
+                            setTxPrimaryLines(newLines);
+                          }}
+                          className="pl-6 font-mono bg-white h-10 border-guide"
+                          placeholder="0.00"
+                        />
+                      </div>
+                      {txPrimaryLines.length > 1 && (
+                        <button
+                          onClick={() => setTxPrimaryLines(txPrimaryLines.filter((_, i) => i !== idx))}
+                          className="p-2 text-text-secondary hover:text-accounting-red transition-colors"
+                        >
+                          &times;
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => setTxPrimaryLines([...txPrimaryLines, { id: generateId(), accountName: '', amount: '' }])}
+                    className="text-xs font-sans uppercase font-bold text-text-secondary hover:text-ink transition-colors flex items-center gap-1 mt-1"
+                  >
+                    <Plus className="w-3 h-3" /> Add Account
+                  </button>
                 </div>
+
                 <div className="flex flex-col gap-2 shrink-0 pt-6">
                   <div className="flex bg-white rounded border border-guide overflow-hidden">
                     <button
@@ -383,21 +427,59 @@ export const TAccountLedger = () => {
 
               <div>
                 <label className="font-sans text-label uppercase tracking-wide text-text-secondary block mb-2">
-                  Offsetting Account (Auto-Balances)
+                  Offsetting Account(s) (Auto-Balances)
                 </label>
-                <div className="flex items-center gap-3">
-                  <span className={`px-2 py-1 bg-white font-sans text-[10px] font-bold uppercase rounded border border-guide ${txIsDebit ? 'text-emerald-600' : 'text-red-600'}`}>
+                <div className="flex items-start gap-3">
+                  <span className={`px-2 py-1 mt-1.5 bg-white font-sans text-[10px] font-bold uppercase rounded border border-guide shrink-0 ${txIsDebit ? 'text-emerald-600' : 'text-red-600'}`}>
                     {txIsDebit ? 'CREDIT' : 'DEBIT'}
                   </span>
-                  <div className="flex-1">
-                    <AccountCombobox
-                      value={txOffsetAccount}
-                      onChange={setTxOffsetAccount}
-                      existingAccounts={accounts.map(a => a.accountName)}
-                      placeholder="Select opposing account"
-                      className="font-serif bg-white h-10 px-3 w-full border border-guide rounded"
-                      onFocus={() => { }} onBlur={() => { }} onKeyDown={() => { }}
-                    />
+                  <div className="flex-1 space-y-3">
+                    {txOffsetLines.map((line, idx) => (
+                      <div key={line.id} className="flex items-center gap-2">
+                        <div className="flex-1">
+                          <AccountCombobox
+                            value={line.accountName}
+                            onChange={(val) => {
+                              const newLines = [...txOffsetLines];
+                              newLines[idx].accountName = val;
+                              setTxOffsetLines(newLines);
+                            }}
+                            existingAccounts={accounts.map(a => a.accountName)}
+                            placeholder="Select opposing account"
+                            className="font-serif bg-white h-10 px-3 w-full border border-guide rounded"
+                            onFocus={() => { }} onBlur={() => { }} onKeyDown={() => { }}
+                          />
+                        </div>
+                        <div className="w-28 relative shrink-0">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-muted text-sm">$</span>
+                          <Input
+                            type="number"
+                            value={line.amount}
+                            onChange={(e) => {
+                              const newLines = [...txOffsetLines];
+                              newLines[idx].amount = e.target.value;
+                              setTxOffsetLines(newLines);
+                            }}
+                            className="pl-6 font-mono bg-white h-10 border-guide"
+                            placeholder="0.00"
+                          />
+                        </div>
+                        {txOffsetLines.length > 1 && (
+                          <button
+                            onClick={() => setTxOffsetLines(txOffsetLines.filter((_, i) => i !== idx))}
+                            className="p-2 text-text-secondary hover:text-accounting-red transition-colors"
+                          >
+                            &times;
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    <button
+                      onClick={() => setTxOffsetLines([...txOffsetLines, { id: generateId(), accountName: '', amount: '' }])}
+                      className="text-xs font-sans uppercase font-bold text-text-secondary hover:text-ink transition-colors flex items-center gap-1 mt-1"
+                    >
+                      <Plus className="w-3 h-3" /> Add Account
+                    </button>
                   </div>
                 </div>
               </div>
@@ -424,7 +506,7 @@ export const TAccountLedger = () => {
               </button>
               <button
                 onClick={handleSubmitFastTx}
-                disabled={!txDate || !txPrimaryAccount || !txOffsetAccount || !txAmount}
+                disabled={!txDate || txPrimaryLines.length === 0 || txOffsetLines.length === 0}
                 className="px-5 py-2.5 bg-ink text-white font-sans text-label uppercase tracking-wide rounded-paper hover:bg-ink/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Record Entry

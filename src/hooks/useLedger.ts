@@ -266,6 +266,44 @@ export const useLedger = (userId?: string) => {
     return newEntry.id;
   }, [markDirty]);
 
+  const addCompleteJournalEntry = useCallback((
+    workbookId: string,
+    date: string,
+    description: string,
+    lines: Omit<JournalEntryLine, 'id'>[]
+  ): string => {
+    const newEntry: JournalEntry = {
+      id: generateId(),
+      entryNumber: 0,
+      date: date || new Date().toISOString(),
+      description,
+      lines: lines.map(line => ({ ...line, id: generateId() })),
+      isBalanced: false, // Calculated next
+      totalDebit: 0,
+      totalCredit: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    const totals = calculateTotals(newEntry.lines);
+    newEntry.totalDebit = totals.totalDebit;
+    newEntry.totalCredit = totals.totalCredit;
+    newEntry.isBalanced = totals.isBalanced;
+
+    markDirty(workbookId, prev => prev.map(wb => {
+      if (wb.id !== workbookId) return wb;
+      const entryNumber = wb.entries.length + 1;
+      const entryWithNumber = { ...newEntry, entryNumber };
+      return {
+        ...wb,
+        entries: [...wb.entries, entryWithNumber],
+        updatedAt: new Date(),
+      };
+    }));
+
+    return newEntry.id;
+  }, [markDirty]);
+
   const updateJournalEntry = useCallback((workbookId: string, entryId: string, updates: Partial<JournalEntry>) => {
     markDirty(workbookId, prev => prev.map(wb => {
       if (wb.id !== workbookId) return wb;
@@ -796,6 +834,7 @@ export const useLedger = (userId?: string) => {
     deleteWorkbook,
     selectWorkbook,
     createJournalEntry,
+    addCompleteJournalEntry,
     createFastJournalEntry,
     updateJournalEntry,
     deleteJournalEntry,
