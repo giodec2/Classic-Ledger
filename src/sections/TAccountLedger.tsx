@@ -367,13 +367,13 @@ export const TAccountLedger = () => {
                   <div className="flex bg-white rounded border border-guide overflow-hidden">
                     <button
                       onClick={() => setTxIsDebit(true)}
-                      className={`px-4 py-1.5 font-sans text-xs uppercase tracking-wider font-bold transition-colors \${txIsDebit ? 'bg-accounting-red text-white' : 'text-text-secondary hover:bg-guide/30'}`}
+                      className={`px-4 py-1.5 font-sans text-xs uppercase tracking-wider font-bold transition-colors ${txIsDebit ? 'bg-red-600 text-white' : 'text-text-secondary hover:bg-guide/30'}`}
                     >
                       Debit
                     </button>
                     <button
                       onClick={() => setTxIsDebit(false)}
-                      className={`px-4 py-1.5 font-sans text-xs uppercase tracking-wider font-bold transition-colors \${!txIsDebit ? 'bg-emerald-700 text-white' : 'text-text-secondary hover:bg-guide/30'}`}
+                      className={`px-4 py-1.5 font-sans text-xs uppercase tracking-wider font-bold transition-colors ${!txIsDebit ? 'bg-emerald-600 text-white' : 'text-text-secondary hover:bg-guide/30'}`}
                     >
                       Credit
                     </button>
@@ -386,7 +386,7 @@ export const TAccountLedger = () => {
                   Offsetting Account (Auto-Balances)
                 </label>
                 <div className="flex items-center gap-3">
-                  <span className={`px-2 py-1 bg-white font-sans text-[10px] font-bold uppercase rounded border border-guide \${txIsDebit ? 'text-emerald-700' : 'text-accounting-red'}`}>
+                  <span className={`px-2 py-1 bg-white font-sans text-[10px] font-bold uppercase rounded border border-guide ${txIsDebit ? 'text-emerald-600' : 'text-red-600'}`}>
                     {txIsDebit ? 'CREDIT' : 'DEBIT'}
                   </span>
                   <div className="flex-1">
