@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
+import { Plus } from 'lucide-react';
 import { useLedgerContext } from '@/hooks/LedgerContext';
 import { formatCurrency, type TAccount, type TAccountEntry } from '@/types/accounting';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -38,7 +39,7 @@ const TAccountCard = ({ account, onEntryClick }: TAccountCardProps) => {
               >
                 <div className="flex justify-between items-center">
                   <span className="font-mono text-micro text-text-secondary">
-                    #{entry.journalEntryNumber}
+                    {new Date(entry.date).toLocaleDateString('en-GB')}
                   </span>
                   <span className="font-mono text-data text-ink tabular-nums">
                     {formatCurrency(entry.amount)}
@@ -68,7 +69,7 @@ const TAccountCard = ({ account, onEntryClick }: TAccountCardProps) => {
               >
                 <div className="flex justify-between items-center">
                   <span className="font-mono text-micro text-text-secondary">
-                    #{entry.journalEntryNumber}
+                    {new Date(entry.date).toLocaleDateString('en-GB')}
                   </span>
                   <span className="font-mono text-data text-ink tabular-nums">
                     {formatCurrency(entry.amount)}
@@ -91,9 +92,8 @@ const TAccountCard = ({ account, onEntryClick }: TAccountCardProps) => {
           <span className="font-sans text-label uppercase tracking-wide text-text-secondary">
             Balance
           </span>
-          <span className={`font-mono text-data tabular-nums ${
-            account.balance >= 0 ? 'text-ink' : 'text-accounting-red'
-          }`}>
+          <span className={`font-mono text-data tabular-nums ${account.balance >= 0 ? 'text-ink' : 'text-accounting-red'
+            }`}>
             {formatCurrency(Math.abs(account.balance))} {account.balanceType === 'debit' ? 'Dr' : 'Cr'}
           </span>
         </div>
@@ -103,7 +103,7 @@ const TAccountCard = ({ account, onEntryClick }: TAccountCardProps) => {
 };
 
 export const TAccountLedger = () => {
-  const { currentWorkbook, currentWorkbookId, generateTAccounts } = useLedgerContext();
+  const { currentWorkbook, currentWorkbookId, generateTAccounts, createJournalEntry, setCurrentEntryId, setCurrentView } = useLedgerContext();
   const [accounts, setAccounts] = useState<TAccount[]>([]);
   const [selectedEntry, setSelectedEntry] = useState<TAccountEntry | null>(null);
 
@@ -127,11 +127,11 @@ export const TAccountLedger = () => {
         { opacity: 0, x: -40 },
         { opacity: 1, x: 0, duration: 0.5 }
       )
-      .fromTo(gridRef.current?.children || [],
-        { opacity: 0, y: 50, scale: 0.98 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.1 },
-        '-=0.3'
-      );
+        .fromTo(gridRef.current?.children || [],
+          { opacity: 0, y: 50, scale: 0.98 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.1 },
+          '-=0.3'
+        );
     });
 
     return () => ctx.revert();
@@ -156,22 +156,46 @@ export const TAccountLedger = () => {
         <h1 className="font-display text-display text-ink tracking-tight">
           T-Accounts
         </h1>
-        <p className="font-serif text-body text-text-secondary mt-2">
-          T-accounts visualize the flow of value into specific account buckets.
-        </p>
+        <div className="flex items-center justify-between mt-2">
+          <p className="font-serif text-body text-text-secondary">
+            T-accounts visualize the flow of value. They perfectly mirror the General Journal so any changes made there will update the T-accounts here automatically.
+          </p>
+          <button
+            onClick={() => {
+              const entryId = createJournalEntry(currentWorkbookId!);
+              setCurrentEntryId(entryId);
+              setCurrentView('journal');
+            }}
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-accounting-red text-white font-sans text-[11px] uppercase tracking-wide rounded-paper hover:bg-accounting-red/90 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            New Entry
+          </button>
+        </div>
       </div>
 
       {/* T-Accounts Grid */}
       {accounts.length === 0 ? (
         <div className="flex items-center justify-center h-64 border border-dashed border-guide rounded-paper">
           <div className="text-center">
-            <p className="font-serif text-body text-text-secondary">
+            <p className="font-serif text-body text-text-secondary mb-4">
               No accounts yet. Record journal entries to generate T-accounts.
             </p>
+            <button
+              onClick={() => {
+                const entryId = createJournalEntry(currentWorkbookId!);
+                setCurrentEntryId(entryId);
+                setCurrentView('journal');
+              }}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-accounting-red text-white font-sans text-label uppercase tracking-wide rounded-paper hover:bg-accounting-red/90 transition-colors shadow-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Register First Entry
+            </button>
           </div>
         </div>
       ) : (
-        <div 
+        <div
           ref={gridRef}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
