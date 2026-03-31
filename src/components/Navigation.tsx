@@ -60,7 +60,7 @@ export const Navigation = ({ user }: { user: User | null }) => {
     );
   }
 
-  if (currentView === 'learning' || currentView === 'journal-learning' || currentView === 'adjusting-learning' || currentView === 'final-learning') {
+  if (currentView === 'learning' || currentView === 'journal-learning' || currentView === 'adjusting-learning' || currentView === 'final-learning' || currentView === 'academy-hub') {
     return (
       <nav className="fixed top-0 left-0 right-0 z-50 px-[6vw] py-3 flex items-center justify-between bg-ivory/90 backdrop-blur-sm border-b border-guide">
         <div className="flex items-center gap-4">
@@ -73,7 +73,7 @@ export const Navigation = ({ user }: { user: User | null }) => {
           </button>
           <div className="w-px h-4 bg-guide" />
           <div className="font-serif text-heading text-ink truncate max-w-[200px]">
-            Learning Module
+            {currentView === 'academy-hub' ? 'Academy Simulators' : 'Learning Module'}
           </div>
         </div>
 

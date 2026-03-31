@@ -185,7 +185,8 @@ export type ViewMode =
   | 'running-balance'
   | 'balance-sheet'
   | 'income-statement'
-  | 'cash-flow';
+  | 'cash-flow'
+  | 'academy-hub';
 
 // Utility functions
 export const formatCurrency = (amount: number | null): string => {

@@ -136,6 +136,18 @@ export const Dashboard = () => {
                   <span className="block font-serif text-[13px] text-text-secondary group-hover:text-purple-600/80 transition-colors">Net Income & Balance Sheet</span>
                 </div>
               </button>
+              <button
+                onClick={() => setCurrentView('academy-hub')}
+                className="inline-flex items-center gap-3 px-5 py-3 bg-surface border border-guide rounded-paper hover:border-yellow-400 text-text-secondary transition-all group shadow-sm hover:shadow-md w-full max-w-sm"
+              >
+                <div className="w-8 h-8 rounded-full bg-ink/5 flex items-center justify-center group-hover:bg-yellow-500 group-hover:text-white transition-colors shrink-0">
+                  <Calculator className="w-4 h-4" />
+                </div>
+                <div className="text-left leading-tight">
+                  <span className="block font-sans text-label uppercase tracking-wide group-hover:text-yellow-600 transition-colors text-ink">Academy Simulators</span>
+                  <span className="block font-serif text-[13px] text-text-secondary group-hover:text-yellow-600/80 transition-colors">Advanced accounting tools</span>
+                </div>
+              </button>
             </div>
 
             <div className="font-mono text-data text-text-secondary pt-8 border-t border-guide w-1/2">
