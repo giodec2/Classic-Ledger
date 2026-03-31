@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react';
-import { Calculator, ArrowRight, TrendingDown } from 'lucide-react';
+import { TrendingDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/types/accounting';
 
 export const BadDebtEstimator = () => {
