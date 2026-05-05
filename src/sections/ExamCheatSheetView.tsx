@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import { FileText, Building2, Calculator, Package, CheckCircle2, TrendingUp, AlertTriangle, Factory, Trash2 } from 'lucide-react';
+import { FileText, Building2, Calculator, Package, CheckCircle2, AlertTriangle, Factory, Trash2 } from 'lucide-react';
 
 export const ExamCheatSheetView = () => {
     const containerRef = useRef<HTMLDivElement>(null);
