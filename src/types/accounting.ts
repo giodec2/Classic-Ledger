@@ -179,6 +179,7 @@ export type ViewMode =
   | 'journal-learning'
   | 'adjusting-learning'
   | 'final-learning'
+  | 'exam-cheat-sheet'
   | 'journal'
   | 'ledger'
   | 'trial-balance'

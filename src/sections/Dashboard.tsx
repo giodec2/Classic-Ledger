@@ -137,6 +137,19 @@ export const Dashboard = () => {
                 </div>
               </button>
               <button
+                onClick={() => setCurrentView('exam-cheat-sheet')}
+                className="inline-flex items-center gap-3 px-5 py-3 bg-surface border border-guide rounded-paper hover:border-red-400 text-text-secondary transition-all group shadow-sm hover:shadow-md w-full max-w-sm"
+              >
+                <div className="w-8 h-8 rounded-full bg-ink/5 flex items-center justify-center group-hover:bg-red-500 group-hover:text-white transition-colors shrink-0">
+                  <BookOpen className="w-4 h-4" />
+                </div>
+                <div className="text-left leading-tight">
+                  <span className="block font-sans text-label uppercase tracking-wide group-hover:text-red-600 transition-colors text-ink">Exam Cheat Sheet</span>
+                  <span className="block font-serif text-[13px] text-text-secondary group-hover:text-red-600/80 transition-colors">Formulas & Rules</span>
+                </div>
+              </button>
+
+              <button
                 onClick={() => setCurrentView('academy-hub')}
                 className="inline-flex items-center gap-3 px-5 py-3 bg-surface border border-guide rounded-paper hover:border-yellow-400 text-text-secondary transition-all group shadow-sm hover:shadow-md w-full max-w-sm"
               >

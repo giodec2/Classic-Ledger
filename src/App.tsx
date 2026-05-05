@@ -22,6 +22,7 @@ import { JournalLearningView } from '@/sections/JournalLearningView';
 import { AdjustingJournalLearningView } from '@/sections/AdjustingJournalLearningView';
 import { FinalAdjustmentsLearningView } from '@/sections/FinalAdjustmentsLearningView';
 import { AcademyHub } from '@/sections/AcademyHub';
+import { ExamCheatSheetView } from '@/sections/ExamCheatSheetView';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -66,6 +67,7 @@ function AppContent({ user }: { user: User }) {
         )}
         {currentView === 'learning' && <LearningView />}
         {currentView === 'academy-hub' && <AcademyHub />}
+        {currentView === 'exam-cheat-sheet' && <ExamCheatSheetView />}
         {currentView === 'journal-learning' && <JournalLearningView />}
         {currentView === 'adjusting-learning' && <AdjustingJournalLearningView />}
         {currentView === 'final-learning' && <FinalAdjustmentsLearningView />}
