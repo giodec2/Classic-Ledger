@@ -107,20 +107,20 @@ export const ExamCheatSheetView = () => {
                     <div className="mt-1 border-t border-guide pt-3">
                         <h3 className="font-sans text-[11px] font-bold uppercase tracking-wide text-ink mb-2">Required Book Adjusting Entries (Compound JEs)</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div className="bg-white p-2 rounded border border-guide font-mono text-[10px] shadow-sm space-y-1">
-                                <p className="text-emerald-700 font-sans font-bold mb-1 pb-1 border-b border-guide/50 text-[10px]">To record items INCREASING Cash:</p>
+                            <div className="bg-white p-2 rounded border border-guide font-mono text-[11px] shadow-sm space-y-1">
+                                <p className="text-emerald-700 font-sans font-bold mb-1 pb-1 border-b border-guide/50 text-[11px]">To record items INCREASING Cash:</p>
                                 <div className="flex justify-between"><span>Cash</span><span>XXX</span></div>
                                 <div className="flex justify-between pl-6 text-text-secondary"><span>Notes Receivable</span><span>XXX</span></div>
                                 <div className="flex justify-between pl-6 text-text-secondary"><span>Interest Revenue</span><span>XXX</span></div>
                             </div>
-                            <div className="bg-white p-2 rounded border border-guide font-mono text-[10px] shadow-sm space-y-1">
-                                <p className="text-red-700 font-sans font-bold mb-1 pb-1 border-b border-guide/50 text-[10px]">To record items DECREASING Cash:</p>
+                            <div className="bg-white p-2 rounded border border-guide font-mono text-[11px] shadow-sm space-y-1">
+                                <p className="text-red-700 font-sans font-bold mb-1 pb-1 border-b border-guide/50 text-[11px]">To record items DECREASING Cash:</p>
                                 <div className="flex justify-between"><span>Accounts Receivable (NSF)</span><span>XXX</span></div>
                                 <div className="flex justify-between"><span>Bank Fee Expense</span><span>XXX</span></div>
                                 <div className="flex justify-between pl-6 text-text-secondary"><span>Cash</span><span>XXX</span></div>
                             </div>
                         </div>
-                        <p className="text-[10px] text-text-secondary mt-2 italic flex items-start gap-1 leading-tight">
+                        <p className="text-[11px] text-text-secondary mt-2 italic flex items-start gap-1 leading-tight">
                             <AlertTriangle className="w-3 h-3 text-amber-500 shrink-0" />
                             <span>Use exact titles like "Accounts Receivable" for NSF. No abbreviations. Indent credits. List outstanding checks individually on the bank side if given. Single/split JEs will not be accepted.</span>
                         </p>
@@ -150,7 +150,7 @@ export const ExamCheatSheetView = () => {
                             <p className="font-serif text-[11px] text-rose-900/70 mb-2">(Income Statement Approach)</p>
                             
                             <div className="bg-white p-2 rounded border border-rose-100 mb-2">
-                                <p className="font-mono text-[10px] font-bold text-ink mb-1">Formula:</p>
+                                <p className="font-mono text-[11px] font-bold text-ink mb-1">Formula:</p>
                                 <p className="font-mono flex items-center justify-center py-1 bg-rose-100/50 rounded text-rose-900 border border-rose-200 border-dashed text-[11px]">
                                     Exp = Net Credit Sales × % Uncollectible
                                 </p>
@@ -176,8 +176,8 @@ export const ExamCheatSheetView = () => {
                             <p className="font-serif text-[11px] text-amber-900/70 mb-2">(Balance Sheet Approach)</p>
                             
                             <div className="bg-white p-2 rounded border border-amber-100 mb-2">
-                                <p className="font-mono text-[10px] font-bold text-ink mb-1">Formula:</p>
-                                <div className="font-mono text-[10px] bg-amber-100/50 p-1.5 rounded text-amber-900 border border-amber-200 border-dashed leading-tight">
+                                <p className="font-mono text-[11px] font-bold text-ink mb-1">Formula:</p>
+                                <div className="font-mono text-[11px] bg-amber-100/50 p-1.5 rounded text-amber-900 border border-amber-200 border-dashed leading-tight">
                                     <div>1. Target Allowance = Σ (Aging Bucket × Bucket %)</div>
                                     <div className="pt-0.5 mt-0.5 border-t border-amber-200/50">2. Exp = Target Allowance - Current Unadj. Balance</div>
                                 </div>
@@ -199,24 +199,24 @@ export const ExamCheatSheetView = () => {
                     {/* A/R Journal Entries */}
                     <div className="mt-2 border-t border-guide pt-3">
                         <h3 className="font-sans text-[11px] font-bold uppercase tracking-wide text-ink mb-2">Common A/R Journal Entries</h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2 font-mono text-[10px]">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2 font-mono text-[11px]">
                             <div className="bg-white p-2 rounded border border-guide shadow-sm space-y-1">
-                                <p className="font-sans font-bold text-[9px] uppercase text-text-secondary mb-1 border-b border-guide/50 pb-0.5">1. Credit Sale</p>
+                                <p className="font-sans font-bold text-[10px] uppercase text-text-secondary mb-1 border-b border-guide/50 pb-0.5">1. Credit Sale</p>
                                 <div className="flex justify-between"><span>Accounts Receivable</span><span>X</span></div>
                                 <div className="flex justify-between pl-4 text-text-secondary"><span>Sales Revenue</span><span>X</span></div>
                             </div>
                             <div className="bg-white p-2 rounded border border-guide shadow-sm space-y-1">
-                                <p className="font-sans font-bold text-[9px] uppercase text-text-secondary mb-1 border-b border-guide/50 pb-0.5">2. Bad Debt Expense</p>
+                                <p className="font-sans font-bold text-[10px] uppercase text-text-secondary mb-1 border-b border-guide/50 pb-0.5">2. Bad Debt Expense</p>
                                 <div className="flex justify-between"><span>Bad Debt Expense</span><span>X</span></div>
                                 <div className="flex justify-between pl-4 text-text-secondary"><span>Allowance for D.A.</span><span>X</span></div>
                             </div>
                             <div className="bg-white p-2 rounded border border-guide shadow-sm space-y-1">
-                                <p className="font-sans font-bold text-[9px] uppercase text-text-secondary mb-1 border-b border-guide/50 pb-0.5">3. Write-off Uncollectible</p>
+                                <p className="font-sans font-bold text-[10px] uppercase text-text-secondary mb-1 border-b border-guide/50 pb-0.5">3. Write-off Uncollectible</p>
                                 <div className="flex justify-between"><span>Allowance for D.A.</span><span>X</span></div>
                                 <div className="flex justify-between pl-4 text-text-secondary"><span>Accounts Receivable</span><span>X</span></div>
                             </div>
                             <div className="bg-white p-2 rounded border border-guide shadow-sm space-y-1">
-                                <p className="font-sans font-bold text-[9px] uppercase text-text-secondary mb-1 border-b border-guide/50 pb-0.5">4. Recovery (Two JEs)</p>
+                                <p className="font-sans font-bold text-[10px] uppercase text-text-secondary mb-1 border-b border-guide/50 pb-0.5">4. Recovery (Two JEs)</p>
                                 <div className="flex justify-between"><span>Accounts Receivable</span><span>X</span></div>
                                 <div className="flex justify-between pl-4 text-text-secondary mb-1 pb-0.5 border-b border-guide/30"><span>Allowance for D.A.</span><span>X</span></div>
                                 <div className="flex justify-between"><span>Cash</span><span>X</span></div>
@@ -251,8 +251,8 @@ export const ExamCheatSheetView = () => {
                                         <p className="font-sans text-[11px] text-text-secondary leading-tight">Updates real-time. Every sale requires two JEs: one for Revenue/AR, and one to decrease Inventory and increase COGS. Uses "Inventory" account for purchases.</p>
                                     </div>
                                     <div className="mt-auto bg-white p-2 rounded border border-guide shadow-sm">
-                                        <p className="font-mono text-[10px] font-bold text-ink mb-1">Formula (Continuous):</p>
-                                        <div className="font-mono text-[10px] p-1.5 rounded bg-surface border border-guide border-dashed text-text-secondary">
+                                        <p className="font-mono text-[11px] font-bold text-ink mb-1">Formula (Continuous):</p>
+                                        <div className="font-mono text-[11px] p-1.5 rounded bg-surface border border-guide border-dashed text-text-secondary">
                                             <div>Beg. Inv + Purchases = COGAS</div>
                                             <div className="pt-0.5 mt-0.5 border-t border-guide/50">COGAS - COGS (per sale) = <strong className="text-ink">End. Inv</strong></div>
                                         </div>
@@ -262,14 +262,14 @@ export const ExamCheatSheetView = () => {
                                     <div className="mb-2 space-y-1.5">
                                         <strong className="text-ink block mb-0.5 text-xs">Periodic System</strong>
                                         <p className="font-sans text-[11px] text-text-secondary leading-tight">Updates at period end. No COGS recorded at time of sale. Uses "Purchases" temporary account.</p>
-                                        <div className="p-1.5 bg-amber-50 border border-amber-200 rounded text-amber-900 text-[10px] leading-tight">
-                                            <strong className="text-red-700 block mb-0.5 uppercase tracking-wide text-[9px]">Critical Exam Rule:</strong>
+                                        <div className="p-1.5 bg-amber-50 border border-amber-200 rounded text-amber-900 text-[11px] leading-tight">
+                                            <strong className="text-red-700 block mb-0.5 uppercase tracking-wide text-[10px]">Critical Exam Rule:</strong>
                                             You must calculate <strong>Ending Inventory FIRST</strong>, then deduct it from COGAS to find COGS.
                                         </div>
                                     </div>
                                     <div className="mt-auto bg-white p-2 rounded border border-guide shadow-sm">
-                                        <p className="font-mono text-[10px] font-bold text-ink mb-1">Formula (End of Period):</p>
-                                        <div className="font-mono text-[10px] p-1.5 rounded bg-surface border border-guide border-dashed text-text-secondary">
+                                        <p className="font-mono text-[11px] font-bold text-ink mb-1">Formula (End of Period):</p>
+                                        <div className="font-mono text-[11px] p-1.5 rounded bg-surface border border-guide border-dashed text-text-secondary">
                                             <div>Beg. Inv + Net Purchases = COGAS</div>
                                             <div className="pt-0.5 mt-0.5 border-t border-guide/50">COGAS - End. Inv (calc'd) = <strong className="text-ink">COGS</strong></div>
                                         </div>
@@ -285,35 +285,35 @@ export const ExamCheatSheetView = () => {
                                 {/* FIFO */}
                                 <div className="border-t-2 border-t-emerald-500 bg-white border border-guide rounded-paper p-3 shadow-sm">
                                     <h4 className="font-serif font-bold text-sm text-ink mb-1">FIFO</h4>
-                                    <p className="font-sans text-[9px] text-text-secondary uppercase tracking-widest mb-1.5">First-In, First-Out</p>
-                                    <ul className="space-y-1 font-sans text-[10px] text-text-secondary leading-tight">
+                                    <p className="font-sans text-[10px] text-text-secondary uppercase tracking-widest mb-1.5">First-In, First-Out</p>
+                                    <ul className="space-y-1 font-sans text-[11px] text-text-secondary leading-tight">
                                         <li>• Oldest units sold first.</li>
                                         <li>• Ending Inventory = newest costs.</li>
                                         <li>• <strong>Inflation:</strong> Highest Net Income.</li>
-                                        <li className="pt-1 mt-1 border-t border-guide italic text-[9px]">Note: Yields IDENTICAL results in both Perpetual and Periodic.</li>
+                                        <li className="pt-1 mt-1 border-t border-guide italic text-[10px]">Note: Yields IDENTICAL results in both Perpetual and Periodic.</li>
                                     </ul>
                                 </div>
 
                                 {/* LIFO */}
                                 <div className="border-t-2 border-t-rose-500 bg-white border border-guide rounded-paper p-3 shadow-sm">
                                     <h4 className="font-serif font-bold text-sm text-ink mb-1">LIFO</h4>
-                                    <p className="font-sans text-[9px] text-text-secondary uppercase tracking-widest mb-1.5">Last-In, First-Out</p>
-                                    <ul className="space-y-1 font-sans text-[10px] text-text-secondary leading-tight">
+                                    <p className="font-sans text-[10px] text-text-secondary uppercase tracking-widest mb-1.5">Last-In, First-Out</p>
+                                    <ul className="space-y-1 font-sans text-[11px] text-text-secondary leading-tight">
                                         <li>• Newest units sold first.</li>
                                         <li>• Ending Inventory = oldest costs.</li>
                                         <li>• <strong>Inflation:</strong> Lowest Net Income, lowest taxes.</li>
-                                        <li className="pt-1 mt-1 border-t border-guide italic text-[9px]">Note: Results DIFFER between Perpetual and Periodic.</li>
+                                        <li className="pt-1 mt-1 border-t border-guide italic text-[10px]">Note: Results DIFFER between Perpetual and Periodic.</li>
                                     </ul>
                                 </div>
 
                                 {/* Average */}
                                 <div className="border-t-2 border-t-blue-500 bg-white border border-guide rounded-paper p-3 shadow-sm">
                                     <h4 className="font-serif font-bold text-sm text-ink mb-1">Average Cost</h4>
-                                    <p className="font-sans text-[9px] text-text-secondary uppercase tracking-widest mb-1.5">Smoothed Costs</p>
-                                    <ul className="space-y-1 font-sans text-[10px] text-text-secondary leading-tight">
+                                    <p className="font-sans text-[10px] text-text-secondary uppercase tracking-widest mb-1.5">Smoothed Costs</p>
+                                    <ul className="space-y-1 font-sans text-[11px] text-text-secondary leading-tight">
                                         <li>• <strong className="text-ink">Periodic:</strong> Tot. Cost / Tot. Units calculated ONCE at period end.</li>
                                         <li>• <strong className="text-ink">Perpetual:</strong> New average calculated after EVERY purchase.</li>
-                                        <li className="pt-1 mt-1 border-t border-guide italic text-[9px]">Note: Balances out price volatility.</li>
+                                        <li className="pt-1 mt-1 border-t border-guide italic text-[10px]">Note: Balances out price volatility.</li>
                                     </ul>
                                 </div>
                             </div>
@@ -341,9 +341,9 @@ export const ExamCheatSheetView = () => {
                         <div className="border border-purple-200 bg-purple-50/50 rounded-paper p-3">
                             <h3 className="font-sans text-[11px] font-bold uppercase tracking-wide text-purple-800 mb-1.5 border-b border-purple-200 pb-1">Straight-Line</h3>
                             <div className="bg-white p-1.5 rounded border border-purple-100 mb-2 text-center">
-                                <p className="font-mono text-[10px] text-purple-900">(Cost − Residual) / Useful Life</p>
+                                <p className="font-mono text-[11px] text-purple-900">(Cost − Residual) / Useful Life</p>
                             </div>
-                            <ul className="space-y-1 font-sans text-[10px] text-text-secondary leading-tight">
+                            <ul className="space-y-1 font-sans text-[11px] text-text-secondary leading-tight">
                                 <li>• Same expense every year</li>
                                 <li>• Uses residual value in calc</li>
                                 <li>• Best for buildings, stable assets</li>
@@ -355,9 +355,9 @@ export const ExamCheatSheetView = () => {
                         <div className="border border-indigo-200 bg-indigo-50/50 rounded-paper p-3">
                             <h3 className="font-sans text-[11px] font-bold uppercase tracking-wide text-indigo-800 mb-1.5 border-b border-indigo-200 pb-1">Double-Declining (DDB)</h3>
                             <div className="bg-white p-1.5 rounded border border-indigo-100 mb-2 text-center">
-                                <p className="font-mono text-[10px] text-indigo-900">(1/Life) × 2 × Beg.Book Value</p>
+                                <p className="font-mono text-[11px] text-indigo-900">(1/Life) × 2 × Beg.Book Value</p>
                             </div>
-                            <ul className="space-y-1 font-sans text-[10px] text-text-secondary leading-tight">
+                            <ul className="space-y-1 font-sans text-[11px] text-text-secondary leading-tight">
                                 <li className="text-red-600 font-semibold">• IGNORE Residual in calculation!</li>
                                 <li>• Highest early expense</li>
                                 <li>• Best for tech, vehicles</li>
@@ -368,11 +368,11 @@ export const ExamCheatSheetView = () => {
                         {/* Units-of-Output */}
                         <div className="border border-fuchsia-200 bg-fuchsia-50/50 rounded-paper p-3">
                             <h3 className="font-sans text-[11px] font-bold uppercase tracking-wide text-fuchsia-800 mb-1.5 border-b border-fuchsia-200 pb-1">Units-of-Output</h3>
-                            <div className="bg-white p-1.5 rounded border border-fuchsia-100 mb-2 space-y-0.5 text-center font-mono text-[9px]">
+                            <div className="bg-white p-1.5 rounded border border-fuchsia-100 mb-2 space-y-0.5 text-center font-mono text-[10px]">
                                 <div>$/Unit = (Cost−Residual)/Total Units</div>
                                 <div className="border-t border-fuchsia-100 pt-0.5">Exp = $/Unit × Units Used</div>
                             </div>
-                            <ul className="space-y-1 font-sans text-[10px] text-text-secondary leading-tight">
+                            <ul className="space-y-1 font-sans text-[11px] text-text-secondary leading-tight">
                                 <li>• Varies by actual use</li>
                                 <li>• Uses residual value in calc</li>
                                 <li>• Best for production equipment</li>
@@ -382,8 +382,8 @@ export const ExamCheatSheetView = () => {
 
                     {/* Partial Year Depreciation */}
                     <div className="bg-surface border border-guide p-2.5 rounded-paper shadow-sm">
-                         <h3 className="font-sans text-[10px] font-bold uppercase tracking-wide text-ink mb-1">Partial Year Depreciation</h3>
-                         <div className="flex flex-col md:flex-row gap-2 font-sans text-[10px] text-text-secondary leading-tight">
+                         <h3 className="font-sans text-[11px] font-bold uppercase tracking-wide text-ink mb-1">Partial Year Depreciation</h3>
+                         <div className="flex flex-col md:flex-row gap-2 font-sans text-[11px] text-text-secondary leading-tight">
                              <div className="flex-1"><strong className="text-ink">Months Method:</strong> Annual Depr × (Months Used / 12)</div>
                              <div className="flex-1"><strong className="text-ink">Half-Year Convention:</strong> Record ½ year depr. in purchase AND disposal year</div>
                          </div>
@@ -412,7 +412,7 @@ export const ExamCheatSheetView = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div className="border border-emerald-200 bg-emerald-50/50 rounded-paper p-3">
                             <h3 className="font-sans text-[11px] font-bold uppercase tracking-wide text-emerald-800 mb-1.5 border-b border-emerald-200 pb-1">Gain (Cash &gt; Book Value)</h3>
-                            <div className="bg-white p-2 rounded border border-emerald-100 shadow-sm font-mono text-[10px] space-y-0.5">
+                            <div className="bg-white p-2 rounded border border-emerald-100 shadow-sm font-mono text-[11px] space-y-0.5">
                                 <div className="flex justify-between"><span>Dr. Cash (received)</span><span>X</span></div>
                                 <div className="flex justify-between"><span>Dr. Accum.Depreciation (total)</span><span>X</span></div>
                                 <div className="flex justify-between pl-4 text-text-secondary"><span>Cr. Equipment (cost)</span><span>X</span></div>
@@ -421,7 +421,7 @@ export const ExamCheatSheetView = () => {
                         </div>
                         <div className="border border-red-200 bg-red-50/50 rounded-paper p-3">
                             <h3 className="font-sans text-[11px] font-bold uppercase tracking-wide text-red-800 mb-1.5 border-b border-red-200 pb-1">Loss (Cash &lt; Book Value)</h3>
-                            <div className="bg-white p-2 rounded border border-red-100 shadow-sm font-mono text-[10px] space-y-0.5">
+                            <div className="bg-white p-2 rounded border border-red-100 shadow-sm font-mono text-[11px] space-y-0.5">
                                 <div className="flex justify-between"><span>Dr. Cash (received)</span><span>X</span></div>
                                 <div className="flex justify-between"><span>Dr. Accum.Depreciation (total)</span><span>X</span></div>
                                 <div className="flex justify-between"><span>Dr. Loss on Sale</span><span>X</span></div>
@@ -435,15 +435,15 @@ export const ExamCheatSheetView = () => {
                         <div className="lg:col-span-2 space-y-2">
                              <h3 className="font-sans text-[11px] font-bold uppercase tracking-wide text-ink">Special Disposal Cases</h3>
                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                <div className="bg-surface border border-guide rounded p-2.5 font-sans text-[10px] leading-tight">
+                                <div className="bg-surface border border-guide rounded p-2.5 font-sans text-[11px] leading-tight">
                                     <strong className="text-ink block mb-0.5">Fully Depreciated / Scrapped</strong>
                                     <p className="text-text-secondary mb-1.5">No gain or loss if fully depreciated. If scraped with value remaining, Loss = Book Value.</p>
-                                    <div className="font-mono bg-white p-1 border border-guide rounded text-[9px]">
+                                    <div className="font-mono bg-white p-1 border border-guide rounded text-[10px]">
                                         <div className="flex justify-between"><span>Dr. Accum.Depr. (full)</span></div>
                                         <div className="flex justify-between pl-4 text-text-secondary"><span>Cr. Asset (full cost)</span></div>
                                     </div>
                                 </div>
-                                <div className="bg-surface border border-guide rounded p-2.5 font-sans text-[10px] leading-tight">
+                                <div className="bg-surface border border-guide rounded p-2.5 font-sans text-[11px] leading-tight">
                                     <strong className="text-ink block mb-0.5">Trade-in (Exchange)</strong>
                                     <p className="text-text-secondary"><strong>Commercial Substance:</strong> Record new asset at fair value, recognize gain/loss.<br/><strong>Without:</strong> Record at book value of old + cash paid. No gain recognized.</p>
                                 </div>
@@ -451,7 +451,7 @@ export const ExamCheatSheetView = () => {
                         </div>
                         <div>
                              <h3 className="font-sans text-[11px] font-bold uppercase tracking-wide text-ink mb-2">Disposal Checklist</h3>
-                             <ul className="space-y-1 font-sans text-[10px] text-text-secondary leading-tight">
+                             <ul className="space-y-1 font-sans text-[11px] text-text-secondary leading-tight">
                                  <li className="flex gap-1.5 items-start"><CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0 mt-0.5" /> 1. Update depr. to date</li>
                                  <li className="flex gap-1.5 items-start"><CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0 mt-0.5" /> 2. Calculate Book Value</li>
                                  <li className="flex gap-1.5 items-start"><CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0 mt-0.5" /> 3. Compare Cash to BV</li>
