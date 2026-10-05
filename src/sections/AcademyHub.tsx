@@ -1,12 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import { useLedgerContext } from '@/hooks/LedgerContext';
+import { useNavigation } from '@/hooks/NavigationContext';
 import { Package, Building2, Calculator, Settings2, ShieldCheck, PieChart, ArrowLeft } from 'lucide-react';
 import { InventoryValuation } from '@/components/academy/InventoryValuation';
 import { BankReconciliation } from '@/components/academy/BankReconciliation';
 import { BadDebtEstimator } from '@/components/academy/BadDebtEstimator';
+import type { AcademyModuleId } from '@/lib/routes';
 
-const MODULES = [
+const MODULES: { id: AcademyModuleId; title: string; description: string; icon: typeof Package; color: string; bg: string; hover: string }[] = [
     { id: 'inventory', title: 'Inventory Cost Flow', description: 'Simulate FIFO, LIFO, and Average Cost on dynamic layers.', icon: Package, color: 'text-emerald-600', bg: 'bg-emerald-50', hover: 'hover:border-emerald-200 hover:bg-emerald-50/50' },
     { id: 'bank', title: 'Bank Reconciliation', description: 'Balance your books against bank statements and errors.', icon: Building2, color: 'text-blue-600', bg: 'bg-blue-50', hover: 'hover:border-blue-200 hover:bg-blue-50/50' },
     { id: 'bad-debt', title: 'Bad Debt Estimator', description: 'Test Aging vs. % of Sales methods for uncollectible accounts.', icon: Calculator, color: 'text-rose-600', bg: 'bg-rose-50', hover: 'hover:border-rose-200 hover:bg-rose-50/50' },
@@ -14,8 +15,8 @@ const MODULES = [
 
 export const AcademyHub = () => {
     const containerRef = useRef<HTMLDivElement>(null);
-    const { } = useLedgerContext();
-    const [selectedModule, setSelectedModule] = useState<string | null>(null);
+    const { route, navigate } = useNavigation();
+    const selectedModule = route.academyModule;
 
     useEffect(() => {
         const ctx = gsap.context(() => {
@@ -38,10 +39,9 @@ export const AcademyHub = () => {
         <section className="min-h-screen pt-24 pb-24 px-[6vw] bg-ivory paper-grain" ref={containerRef}>
             <div className="max-w-5xl mx-auto space-y-12">
 
-                {/* Back button logic integrated elegantly */}
                 {selectedModule && (
-                    <button 
-                        onClick={() => setSelectedModule(null)}
+                    <button
+                        onClick={() => navigate('academy-hub')}
                         className="flex items-center gap-2 px-4 py-2 bg-surface border border-guide rounded-full font-sans text-xs uppercase tracking-wide text-text-secondary hover:text-ink hover:border-ink/50 transition-all group w-fit shadow-sm"
                     >
                         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to Simulation Library
@@ -59,8 +59,8 @@ export const AcademyHub = () => {
                         {selectedModule ? MODULES.find(m => m.id === selectedModule)?.title : 'Interactive Academy'}
                     </h1>
                     <p className={`font-serif text-body text-text-secondary ${!selectedModule && 'max-w-2xl mx-auto'}`}>
-                        {selectedModule 
-                            ? 'Adjust the variables in real-time below to see how different business scenarios affect the financial outcomes.' 
+                        {selectedModule
+                            ? 'Adjust the variables in real-time below to see how different business scenarios affect the financial outcomes.'
                             : 'Master complex accounting concepts through hands-on, risk-free simulations. These tools are completely isolated from your main ledgers.'}
                     </p>
                 </div>
@@ -71,7 +71,7 @@ export const AcademyHub = () => {
                             {MODULES.map((mod) => (
                                 <button
                                     key={mod.id}
-                                    onClick={() => setSelectedModule(mod.id)}
+                                    onClick={() => navigate('academy-hub', { academyModule: mod.id })}
                                     className={`text-left p-8 bg-surface border border-guide rounded-paper transition-all flex flex-col gap-6 group shadow-sm ${mod.hover}`}
                                 >
                                     <div className={`w-14 h-14 rounded-full ${mod.bg} flex items-center justify-center ${mod.color} group-hover:scale-110 transition-transform shadow-sm`}>

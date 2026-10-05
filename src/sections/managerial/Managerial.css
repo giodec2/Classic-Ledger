@@ -1,0 +1,112 @@
+.ledger-app[data-course-mode="managerial"] {
+  --color-accent: #175e60;
+  --color-managerial: #175e60;
+  --color-pale-red: #e6f2ef;
+  --managerial-accent: #175e60;
+  --managerial-soft: #e6f2ef;
+  --accent: 182 61% 23%;
+}
+
+.ledger-navigation {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  padding: 10px 6vw;
+  background: color-mix(in srgb, var(--color-ivory) 96%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--color-guide);
+  font-family: var(--font-sans);
+  color: var(--color-text-secondary);
+}
+.ledger-navigation-top, .ledger-account-actions, .ledger-navigation-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ledger-navigation-top { justify-content: space-between; }
+.ledger-brand { flex-shrink: 0; }
+.ledger-brand-name {
+  display: block;
+  min-height: 44px;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  font-size: 12px;
+  color: var(--color-ink);
+  padding: 6px 0;
+}
+.course-mode-switch { display: flex; gap: 4px; }
+.course-mode-switch button {
+  min-height: 44px;
+  padding: 5px 10px;
+  font-size: 11px;
+  border: 1px solid var(--color-guide);
+  border-radius: 2px;
+  color: var(--color-text-secondary);
+}
+.course-mode-switch button[aria-pressed="true"] {
+  background: var(--color-ink);
+  color: var(--color-ivory);
+  border-color: var(--color-ink);
+  font-weight: 600;
+}
+.ledger-app[data-course-mode="managerial"] .course-mode-switch button[aria-pressed="true"] {
+  background: var(--managerial-accent);
+  border-color: var(--managerial-accent);
+}
+.ledger-navigation-title {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  color: var(--color-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.ledger-navigation-links { flex-wrap: wrap; padding-top: 4px; }
+.ledger-nav-link, .ledger-new-entry {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 8px 10px;
+  border-radius: 2px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.ledger-nav-link:hover { background: var(--color-guide); color: var(--color-ink); }
+.ledger-nav-link[aria-current="page"] { background: var(--color-ink); color: var(--color-ivory); }
+.ledger-app[data-course-mode="managerial"] .ledger-nav-link[aria-current="page"] { background: var(--managerial-accent); }
+.ledger-new-entry { background: var(--color-accent); color: white; }
+.ledger-display-name { font-size: 12px; }
+.ledger-menu-toggle { display: none; min-width: 44px; min-height: 44px; align-items: center; justify-content: center; }
+.ledger-skip-link { position: absolute; top: -100px; background: var(--color-ivory); color: var(--color-ink); padding: 12px; }
+.ledger-skip-link:focus { top: 8px; z-index: 1; }
+.ledger-app > main { padding-top: max(0px, calc(var(--ledger-navigation-height, 100px) - 64px)); }
+.ledger-app[data-course-mode="managerial"] > main { padding-top: var(--ledger-navigation-height, 100px); }
+.ledger-app[data-course-mode="managerial"] > .managerial-cloud-notice + main { padding-top: 0; }
+.managerial-cloud-notice { margin: calc(var(--ledger-navigation-height, 100px) + 16px) 6vw 0; border: 1px solid var(--color-guide); padding: 12px 16px; font-family: var(--font-sans); font-size: 13px; }
+.managerial-cloud-notice button { text-decoration: underline; margin-left: 12px; min-height: 44px; color: var(--color-accent); }
+.managerial-cloud-notice + main { padding-top: 0; }
+
+@media (max-width: 767px) {
+  .ledger-navigation { padding: 8px 4vw; }
+  .ledger-navigation-title, .ledger-display-name { display: none; }
+  .course-mode-switch button { min-height: 44px; padding: 6px 8px; }
+  .ledger-brand-name { font-size: 11px; }
+  .ledger-account-actions { gap: 0; }
+  .ledger-account-actions .ledger-nav-link { padding: 8px 6px; font-size: 10px; }
+  .ledger-menu-toggle { display: inline-flex; }
+  .ledger-navigation-links { display: none; }
+  .ledger-navigation.is-expanded .ledger-navigation-links { display: flex; max-height: 55vh; overflow-y: auto; }
+  .ledger-navigation-links .ledger-nav-link { flex: 1 0 40%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ledger-app .paper-grain::before { animation: none; }
+  .ledger-app { scroll-behavior: auto; }
+}
+@media print {
+  .ledger-navigation, .managerial-cloud-notice { display: none !important; }
+  .ledger-app > main, .ledger-app[data-course-mode="managerial"] > main { padding-top: 0; }
+}

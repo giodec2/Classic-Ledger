@@ -64,14 +64,16 @@ export const Footer: React.FC = () => {
                 Follow
               </h3>
               <div className="flex items-center gap-4">
-                <a 
+                <a
                   href="#"
+                  onClick={(e) => e.preventDefault()}
                   className="p-2 border border-guide rounded-paper hover:border-ink hover:bg-ink hover:text-ivory transition-all"
                 >
                   <Github className="w-4 h-4" />
                 </a>
-                <a 
+                <a
                   href="#"
+                  onClick={(e) => e.preventDefault()}
                   className="p-2 border border-guide rounded-paper hover:border-ink hover:bg-ink hover:text-ivory transition-all"
                 >
                   <Twitter className="w-4 h-4" />
@@ -141,10 +143,10 @@ export const Footer: React.FC = () => {
             © {new Date().getFullYear()} Classic Ledger. No cookies, no tracking.
           </div>
           <div className="flex items-center gap-6">
-            <a href="#" className="font-sans text-micro text-text-secondary hover:text-ink transition-colors">
+            <a href="#" onClick={(e) => e.preventDefault()} className="font-sans text-micro text-text-secondary hover:text-ink transition-colors">
               Privacy Policy
             </a>
-            <a href="#" className="font-sans text-micro text-text-secondary hover:text-ink transition-colors">
+            <a href="#" onClick={(e) => e.preventDefault()} className="font-sans text-micro text-text-secondary hover:text-ink transition-colors">
               Terms of Service
             </a>
           </div>

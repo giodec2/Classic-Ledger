@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { useLedgerContext } from '@/hooks/LedgerContext';
+import { useNavigation } from '@/hooks/NavigationContext';
 import { Plus, BookOpen, Trash2, Clock, CheckCircle2, AlertCircle, FileText, Settings2, Calculator } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -8,7 +9,8 @@ import { Button } from '@/components/ui/button';
 import { formatShortDate } from '@/types/accounting';
 
 export const Dashboard = () => {
-  const { workbooks, createWorkbook, deleteWorkbook, selectWorkbook, setCurrentView } = useLedgerContext();
+  const { workbooks, createWorkbook, deleteWorkbook } = useLedgerContext();
+  const { navigate } = useNavigation();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [newWorkbookName, setNewWorkbookName] = useState('');
   const [newWorkbookDesc, setNewWorkbookDesc] = useState('');
@@ -86,7 +88,7 @@ export const Dashboard = () => {
             {/* Learn Section Entry Point */}
             <div ref={dateRef} className="pt-2 flex flex-col gap-3">
               <button
-                onClick={() => setCurrentView('learning')}
+                onClick={() => navigate('learning')}
                 className="inline-flex items-center gap-3 px-5 py-3 bg-surface border border-guide rounded-paper hover:border-orange-400 text-text-secondary transition-all group shadow-sm hover:shadow-md w-full max-w-sm"
               >
                 <div className="w-8 h-8 rounded-full bg-ink/5 flex items-center justify-center group-hover:bg-orange-500 group-hover:text-white transition-colors shrink-0">
@@ -99,7 +101,7 @@ export const Dashboard = () => {
               </button>
 
               <button
-                onClick={() => setCurrentView('journal-learning')}
+                onClick={() => navigate('journal-learning')}
                 className="inline-flex items-center gap-3 px-5 py-3 bg-surface border border-guide rounded-paper hover:border-blue-400 text-text-secondary transition-all group shadow-sm hover:shadow-md w-full max-w-sm"
               >
                 <div className="w-8 h-8 rounded-full bg-ink/5 flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition-colors shrink-0">
@@ -112,7 +114,7 @@ export const Dashboard = () => {
               </button>
 
               <button
-                onClick={() => setCurrentView('adjusting-learning')}
+                onClick={() => navigate('adjusting-learning')}
                 className="inline-flex items-center gap-3 px-5 py-3 bg-surface border border-guide rounded-paper hover:border-emerald-400 text-text-secondary transition-all group shadow-sm hover:shadow-md w-full max-w-sm"
               >
                 <div className="w-8 h-8 rounded-full bg-ink/5 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-colors shrink-0">
@@ -125,7 +127,7 @@ export const Dashboard = () => {
               </button>
 
               <button
-                onClick={() => setCurrentView('final-learning')}
+                onClick={() => navigate('final-learning')}
                 className="inline-flex items-center gap-3 px-5 py-3 bg-surface border border-guide rounded-paper hover:border-purple-400 text-text-secondary transition-all group shadow-sm hover:shadow-md w-full max-w-sm"
               >
                 <div className="w-8 h-8 rounded-full bg-ink/5 flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-colors shrink-0">
@@ -137,7 +139,7 @@ export const Dashboard = () => {
                 </div>
               </button>
               <button
-                onClick={() => setCurrentView('exam-cheat-sheet')}
+                onClick={() => navigate('exam-cheat-sheet')}
                 className="inline-flex items-center gap-3 px-5 py-3 bg-surface border border-guide rounded-paper hover:border-red-400 text-text-secondary transition-all group shadow-sm hover:shadow-md w-full max-w-sm"
               >
                 <div className="w-8 h-8 rounded-full bg-ink/5 flex items-center justify-center group-hover:bg-red-500 group-hover:text-white transition-colors shrink-0">
@@ -150,7 +152,7 @@ export const Dashboard = () => {
               </button>
 
               <button
-                onClick={() => setCurrentView('academy-hub')}
+                onClick={() => navigate('academy-hub')}
                 className="inline-flex items-center gap-3 px-5 py-3 bg-surface border border-guide rounded-paper hover:border-yellow-400 text-text-secondary transition-all group shadow-sm hover:shadow-md w-full max-w-sm"
               >
                 <div className="w-8 h-8 rounded-full bg-ink/5 flex items-center justify-center group-hover:bg-yellow-500 group-hover:text-white transition-colors shrink-0">
@@ -194,7 +196,7 @@ export const Dashboard = () => {
                 workbooks.map((workbook) => (
                   <div
                     key={workbook.id}
-                    onClick={() => selectWorkbook(workbook.id)}
+                    onClick={() => navigate('journal', { workbookId: workbook.id })}
                     className="group p-5 border border-guide rounded-paper bg-ivory hover:bg-surface hover:border-ink cursor-pointer transition-all"
                   >
                     <div className="flex items-start justify-between">

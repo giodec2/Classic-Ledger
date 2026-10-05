@@ -85,7 +85,7 @@ export interface RunningBalanceEntry {
   expiredDate?: string;
 }
 
-// Account Types for Financial Statements
+// Account classification used by T-Accounts and the Trial Balance
 export type AccountType =
   | 'asset'
   | 'liability'
@@ -94,72 +94,6 @@ export type AccountType =
   | 'expense'
   | 'contra-asset'
   | 'contra-equity';
-
-// Financial Statements
-export interface BalanceSheet {
-  assets: {
-    currentAssets: BalanceSheetItem[];
-    nonCurrentAssets: BalanceSheetItem[];
-    totalCurrentAssets: number;
-    totalNonCurrentAssets: number;
-    totalAssets: number;
-  };
-  liabilities: {
-    currentLiabilities: BalanceSheetItem[];
-    nonCurrentLiabilities: BalanceSheetItem[];
-    totalCurrentLiabilities: number;
-    totalNonCurrentLiabilities: number;
-    totalLiabilities: number;
-  };
-  equity: {
-    items: BalanceSheetItem[];
-    totalEquity: number;
-  };
-  totalLiabilitiesAndEquity: number;
-  isBalanced: boolean;
-}
-
-export interface BalanceSheetItem {
-  accountName: string;
-  accountCode: string;
-  amount: number;
-  isContra: boolean;
-}
-
-export interface IncomeStatement {
-  revenues: IncomeStatementItem[];
-  totalRevenue: number;
-  expenses: IncomeStatementItem[];
-  totalExpenses: number;
-  grossProfit: number;
-  operatingIncome: number;
-  netIncome: number;
-}
-
-export interface IncomeStatementItem {
-  accountName: string;
-  accountCode: string;
-  amount: number;
-  isOperating: boolean;
-}
-
-export interface CashFlowStatement {
-  operatingActivities: CashFlowItem[];
-  investingActivities: CashFlowItem[];
-  financingActivities: CashFlowItem[];
-  netOperatingCashFlow: number;
-  netInvestingCashFlow: number;
-  netFinancingCashFlow: number;
-  netChangeInCash: number;
-  beginningCash: number;
-  endingCash: number;
-}
-
-export interface CashFlowItem {
-  description: string;
-  amount: number;
-  isInflow: boolean;
-}
 
 export interface Workbook {
   id: string;
@@ -184,10 +118,12 @@ export type ViewMode =
   | 'ledger'
   | 'trial-balance'
   | 'running-balance'
-  | 'balance-sheet'
-  | 'income-statement'
-  | 'cash-flow'
-  | 'academy-hub';
+  | 'academy-hub'
+  | 'managerial-dashboard'
+  | 'cashflow-learning'
+  | 'cashflow-cheat-sheet'
+  | 'cashflow-direct'
+  | 'cashflow-indirect';
 
 // Utility functions
 export const formatCurrency = (amount: number | null): string => {

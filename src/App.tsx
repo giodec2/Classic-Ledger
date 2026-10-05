@@ -2,27 +2,15 @@ import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { LedgerProvider, useLedgerContext } from '@/hooks/LedgerContext';
+import { NavigationProvider, useNavigation } from '@/hooks/NavigationContext';
+import { ManagerialProvider, useManagerialContext } from '@/hooks/ManagerialContext';
+import '@/sections/managerial/Managerial.css';
 import { Navigation } from '@/components/Navigation';
 import { AuthScreen } from '@/components/AuthScreen';
-import { Dashboard } from '@/sections/Dashboard';
-import { JournalEntry } from '@/sections/JournalEntry';
-import { TAccountLedger } from '@/sections/TAccountLedger';
-import { TrialBalance } from '@/sections/TrialBalance';
-import { RunningBalance } from '@/sections/RunningBalance';
-import { BalanceSheetView } from '@/sections/BalanceSheetView';
-import { IncomeStatementView } from '@/sections/IncomeStatementView';
-import { CashFlowView } from '@/sections/CashFlowView';
-import { Footer } from '@/sections/Footer';
+import { AppRouter } from '@/router/AppRouter';
 import { useAuth } from '@/hooks/useAuth';
 import type { User } from '@supabase/supabase-js';
 import './App.css';
-
-import { LearningView } from '@/sections/LearningView';
-import { JournalLearningView } from '@/sections/JournalLearningView';
-import { AdjustingJournalLearningView } from '@/sections/AdjustingJournalLearningView';
-import { FinalAdjustmentsLearningView } from '@/sections/FinalAdjustmentsLearningView';
-import { AcademyHub } from '@/sections/AcademyHub';
-import { ExamCheatSheetView } from '@/sections/ExamCheatSheetView';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -44,40 +32,42 @@ function LoadingScreen() {
 }
 
 function AppContent({ user }: { user: User }) {
-  const { currentView, dbLoading } = useLedgerContext();
+  const { route, navigate } = useNavigation();
+  const { dbLoading, workbooks } = useLedgerContext();
+  const managerial = useManagerialContext();
   const mainRef = useRef<HTMLElement>(null);
 
-  // Reset scroll when view changes
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [currentView]);
+    window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+    mainRef.current?.focus({ preventScroll: true });
+  }, [route.view, route.workbookId, route.academyModule]);
 
-  if (dbLoading) return <LoadingScreen />;
+  useEffect(() => {
+    if (route.mode !== 'financial' || dbLoading) return;
+    if (route.workbookId && !workbooks.some(wb => wb.id === route.workbookId)) {
+      navigate('dashboard', { replace: true });
+    }
+  }, [dbLoading, route.mode, route.workbookId, workbooks, navigate]);
 
+  useEffect(() => {
+    if (route.mode !== 'managerial' || managerial.loading || !managerial.loadSucceeded || !managerial.localRecoveryComplete || managerial.loadError) return;
+    if (route.workbookId && !managerial.workbooks.some(wb => wb.id === route.workbookId)) {
+      navigate('managerial-dashboard', { replace: true });
+    }
+  }, [route.mode, route.workbookId, managerial.loading, managerial.loadSucceeded, managerial.localRecoveryComplete, managerial.loadError, managerial.workbooks, navigate]);
+
+  const notice = route.mode === 'managerial' && (managerial.loadError || managerial.storageWarning || managerial.pendingDeletions.length > 0);
   return (
-    <div className="min-h-screen bg-ivory paper-grain">
+    <div className="ledger-app min-h-screen bg-ivory paper-grain" data-course-mode={route.mode}>
       <Navigation user={user} />
-
-      <main ref={mainRef} className="relative">
-        {currentView === 'dashboard' && (
-          <>
-            <Dashboard />
-            <Footer />
-          </>
-        )}
-        {currentView === 'learning' && <LearningView />}
-        {currentView === 'academy-hub' && <AcademyHub />}
-        {currentView === 'exam-cheat-sheet' && <ExamCheatSheetView />}
-        {currentView === 'journal-learning' && <JournalLearningView />}
-        {currentView === 'adjusting-learning' && <AdjustingJournalLearningView />}
-        {currentView === 'final-learning' && <FinalAdjustmentsLearningView />}
-        {currentView === 'journal' && <JournalEntry />}
-        {currentView === 'ledger' && <TAccountLedger />}
-        {currentView === 'trial-balance' && <TrialBalance />}
-        {currentView === 'running-balance' && <RunningBalance />}
-        {currentView === 'balance-sheet' && <BalanceSheetView />}
-        {currentView === 'income-statement' && <IncomeStatementView />}
-        {currentView === 'cash-flow' && <CashFlowView />}
+      {notice && <aside className="managerial-cloud-notice" role="status">
+        {managerial.loadError && <p>{managerial.loadError.message}</p>}
+        {managerial.storageWarning && <p>{managerial.storageWarning}</p>}
+        {managerial.pendingDeletions.length > 0 && <p>{managerial.pendingDeletions.length} deletion(s) pending cloud confirmation.</p>}
+        <button disabled={managerial.loading} onClick={() => { void managerial.retry(); }}>{managerial.loading ? 'Loading…' : 'Retry cloud sync'}</button>
+      </aside>}
+      <main id="main-content" tabIndex={-1} ref={mainRef} className="relative">
+        {route.mode === 'financial' && dbLoading ? <LoadingScreen /> : <AppRouter />}
       </main>
     </div>
   );
@@ -94,9 +84,13 @@ function App() {
 
   // Logged in → show app with Supabase-backed data
   return (
-    <LedgerProvider userId={user.id}>
-      <AppContent user={user} />
-    </LedgerProvider>
+    <NavigationProvider key={user.id}>
+      <LedgerProvider userId={user.id}>
+        <ManagerialProvider userId={user.id}>
+          <AppContent user={user} />
+        </ManagerialProvider>
+      </LedgerProvider>
+    </NavigationProvider>
   );
 }
 

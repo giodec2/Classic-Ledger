@@ -7,14 +7,7 @@ import type {
   TAccount,
   TrialBalance,
   TrialBalanceRow,
-  ViewMode,
   RunningBalanceItem,
-  BalanceSheet,
-  BalanceSheetItem,
-  IncomeStatement,
-  IncomeStatementItem,
-  CashFlowStatement,
-  CashFlowItem,
 } from '@/types/accounting';
 import {
   generateId,
@@ -25,10 +18,9 @@ import {
 
 
 
-export const useLedger = (userId?: string) => {
+export const useLedger = (userId?: string, workbookId?: string | null) => {
   const [workbooks, setWorkbooks] = useState<Workbook[]>([]);
-  const [currentWorkbookId, setCurrentWorkbookId] = useState<string | null>(null);
-  const [currentView, setCurrentView] = useState<ViewMode>('dashboard');
+  const currentWorkbookId = workbookId ?? null;
   const [currentEntryId, setCurrentEntryId] = useState<string | null>(null);
   const [dbLoading, setDbLoading] = useState(true);
   // Track which workbook IDs have unsaved changes
@@ -36,6 +28,13 @@ export const useLedger = (userId?: string) => {
   // Keep a ref to the latest workbooks so debounce-save never reads stale data
   const workbooksRef = useRef<Workbook[]>(workbooks);
   useEffect(() => { workbooksRef.current = workbooks; }, [workbooks]);
+
+  // Workbook selection lives in the URL; switching workbooks clears the selected entry.
+  const [selectedWorkbookId, setSelectedWorkbookId] = useState(currentWorkbookId);
+  if (selectedWorkbookId !== currentWorkbookId) {
+    setSelectedWorkbookId(currentWorkbookId);
+    if (currentEntryId !== null) setCurrentEntryId(null);
+  }
 
   // Helper: update workbooks state AND mark the changed workbook as dirty
   const markDirty = useCallback((workbookId: string, updater: (prev: Workbook[]) => Workbook[]) => {
@@ -162,20 +161,12 @@ export const useLedger = (userId?: string) => {
 
   const deleteWorkbook = useCallback(async (id: string) => {
     setWorkbooks(prev => prev.filter(wb => wb.id !== id));
-    if (currentWorkbookId === id) {
-      setCurrentWorkbookId(null);
-      setCurrentView('dashboard');
-    }
+    if (currentEntryId) setCurrentEntryId(null);
     if (userId) {
       const { error } = await supabase.from('workbooks').delete().eq('id', id);
       if (error) console.error('Delete workbook error:', error);
     }
-  }, [currentWorkbookId, userId]);
-
-  const selectWorkbook = useCallback((id: string) => {
-    setCurrentWorkbookId(id);
-    setCurrentView('journal');
-  }, []);
+  }, [currentEntryId, userId]);
 
   // Journal entry operations
   const createJournalEntry = useCallback((workbookId: string): string => {
@@ -612,219 +603,11 @@ export const useLedger = (userId?: string) => {
     }));
   }, [markDirty]);
 
-  // Generate Balance Sheet
-  const generateBalanceSheet = useCallback((workbookId: string): BalanceSheet => {
-    const accounts = generateTAccounts(workbookId);
-
-    const currentAssets: BalanceSheetItem[] = [];
-    const nonCurrentAssets: BalanceSheetItem[] = [];
-    const currentLiabilities: BalanceSheetItem[] = [];
-    const nonCurrentLiabilities: BalanceSheetItem[] = [];
-    const equityItems: BalanceSheetItem[] = [];
-
-    accounts.forEach(account => {
-      const amount = Math.abs(account.balance);
-      const isContra = account.accountType === 'contra-asset' || account.accountType === 'contra-equity';
-      const item: BalanceSheetItem = {
-        accountName: account.accountName,
-        accountCode: account.accountCode,
-        amount,
-        isContra,
-      };
-
-      switch (account.accountType) {
-        case 'asset':
-          // Simple heuristic: cash, receivables, inventory = current; others = non-current
-          if (['cash', 'bank', 'receivable', 'inventory', 'prepaid'].some(k =>
-            account.accountName.toLowerCase().includes(k))) {
-            currentAssets.push(item);
-          } else {
-            nonCurrentAssets.push(item);
-          }
-          break;
-        case 'contra-asset':
-          nonCurrentAssets.push(item);
-          break;
-        case 'liability':
-          if (['payable', 'accrued', 'unearned', 'short-term'].some(k =>
-            account.accountName.toLowerCase().includes(k))) {
-            currentLiabilities.push(item);
-          } else {
-            nonCurrentLiabilities.push(item);
-          }
-          break;
-        case 'equity':
-        case 'contra-equity':
-          equityItems.push(item);
-          break;
-      }
-    });
-
-    const totalCurrentAssets = currentAssets.reduce((sum, item) => sum + item.amount, 0);
-    const totalNonCurrentAssets = nonCurrentAssets.reduce((sum, item) =>
-      sum + (item.isContra ? -item.amount : item.amount), 0);
-    const totalAssets = totalCurrentAssets + totalNonCurrentAssets;
-
-    const totalCurrentLiabilities = currentLiabilities.reduce((sum, item) => sum + item.amount, 0);
-    const totalNonCurrentLiabilities = nonCurrentLiabilities.reduce((sum, item) => sum + item.amount, 0);
-    const totalLiabilities = totalCurrentLiabilities + totalNonCurrentLiabilities;
-
-    const totalEquity = equityItems.reduce((sum, item) =>
-      sum + (item.isContra ? -item.amount : item.amount), 0);
-
-    return {
-      assets: {
-        currentAssets,
-        nonCurrentAssets,
-        totalCurrentAssets,
-        totalNonCurrentAssets,
-        totalAssets,
-      },
-      liabilities: {
-        currentLiabilities,
-        nonCurrentLiabilities,
-        totalCurrentLiabilities,
-        totalNonCurrentLiabilities,
-        totalLiabilities,
-      },
-      equity: {
-        items: equityItems,
-        totalEquity,
-      },
-      totalLiabilitiesAndEquity: totalLiabilities + totalEquity,
-      isBalanced: Math.abs(totalAssets - (totalLiabilities + totalEquity)) < 0.001,
-    };
-  }, [generateTAccounts]);
-
-  // Generate Income Statement
-  const generateIncomeStatement = useCallback((workbookId: string): IncomeStatement => {
-    const accounts = generateTAccounts(workbookId);
-
-    const revenues: IncomeStatementItem[] = [];
-    const expenses: IncomeStatementItem[] = [];
-
-    accounts.forEach(account => {
-      const amount = Math.abs(account.balance);
-      const item: IncomeStatementItem = {
-        accountName: account.accountName,
-        accountCode: account.accountCode,
-        amount,
-        isOperating: !['interest', 'tax', 'extraordinary'].some(k =>
-          account.accountName.toLowerCase().includes(k)),
-      };
-
-      if (account.accountType === 'revenue') {
-        revenues.push(item);
-      } else if (account.accountType === 'expense') {
-        expenses.push(item);
-      }
-    });
-
-    const totalRevenue = revenues.reduce((sum, item) => sum + item.amount, 0);
-    const totalExpenses = expenses.reduce((sum, item) => sum + item.amount, 0);
-    const grossProfit = totalRevenue; // Simplified - no COGS tracking
-    const operatingIncome = grossProfit - expenses.filter(e => e.isOperating).reduce((sum, e) => sum + e.amount, 0);
-    const netIncome = totalRevenue - totalExpenses;
-
-    return {
-      revenues,
-      totalRevenue,
-      expenses,
-      totalExpenses,
-      grossProfit,
-      operatingIncome,
-      netIncome,
-    };
-  }, [generateTAccounts]);
-
-  // Generate Cash Flow Statement (simplified indirect method)
-  const generateCashFlowStatement = useCallback((workbookId: string): CashFlowStatement => {
-    const accounts = generateTAccounts(workbookId);
-    const incomeStatement = generateIncomeStatement(workbookId);
-
-    const operatingActivities: CashFlowItem[] = [];
-    const investingActivities: CashFlowItem[] = [];
-    const financingActivities: CashFlowItem[] = [];
-
-    // Start with net income
-    operatingActivities.push({
-      description: 'Net Income',
-      amount: incomeStatement.netIncome,
-      isInflow: incomeStatement.netIncome > 0,
-    });
-
-    accounts.forEach(account => {
-      const amount = Math.abs(account.balance);
-      const description = account.accountName;
-
-      // Categorize based on account type and name
-      if (account.accountType === 'asset' && !account.accountName.toLowerCase().includes('cash')) {
-        // Changes in working capital
-        const isInflow = account.balance < 0; // Decrease in asset = inflow
-        operatingActivities.push({ description, amount, isInflow });
-      } else if (account.accountType === 'liability') {
-        const isInflow = account.balance > 0; // Increase in liability = inflow
-        operatingActivities.push({ description, amount, isInflow });
-      } else if (['equipment', 'building', 'land', 'vehicle'].some(k =>
-        account.accountName.toLowerCase().includes(k))) {
-        const isInflow = account.balance < 0;
-        investingActivities.push({ description, amount, isInflow });
-      } else if (['capital', 'loan', 'debt', 'dividend', 'drawing'].some(k =>
-        account.accountName.toLowerCase().includes(k))) {
-        const isInflow = account.balance > 0;
-        financingActivities.push({ description, amount, isInflow });
-      }
-    });
-
-    const netOperatingCashFlow = operatingActivities.reduce((sum, item) =>
-      sum + (item.isInflow ? item.amount : -item.amount), 0);
-    const netInvestingCashFlow = investingActivities.reduce((sum, item) =>
-      sum + (item.isInflow ? item.amount : -item.amount), 0);
-    const netFinancingCashFlow = financingActivities.reduce((sum, item) =>
-      sum + (item.isInflow ? item.amount : -item.amount), 0);
-
-    const netChangeInCash = netOperatingCashFlow + netInvestingCashFlow + netFinancingCashFlow;
-
-    // Find cash balance
-    const cashAccount = accounts.find(a =>
-      a.accountName.toLowerCase().includes('cash') ||
-      a.accountName.toLowerCase().includes('bank'));
-    const endingCash = cashAccount ? Math.abs(cashAccount.balance) : 0;
-    const beginningCash = Math.max(0, endingCash - netChangeInCash);
-
-    return {
-      operatingActivities,
-      investingActivities,
-      financingActivities,
-      netOperatingCashFlow,
-      netInvestingCashFlow,
-      netFinancingCashFlow,
-      netChangeInCash,
-      beginningCash,
-      endingCash,
-    };
-  }, [generateTAccounts, generateIncomeStatement]);
-
-  // Navigation
-  const navigateTo = useCallback((view: ViewMode, entryId?: string) => {
-    setCurrentView(view);
-    if (entryId) {
-      setCurrentEntryId(entryId);
-    }
-  }, []);
-
-  const goToDashboard = useCallback(() => {
-    setCurrentView('dashboard');
-    setCurrentWorkbookId(null);
-    setCurrentEntryId(null);
-  }, []);
-
   return {
     // State
     workbooks,
     currentWorkbook,
     currentEntry,
-    currentView,
     currentWorkbookId,
     currentEntryId,
     dbLoading,
@@ -832,7 +615,6 @@ export const useLedger = (userId?: string) => {
     // Actions
     createWorkbook,
     deleteWorkbook,
-    selectWorkbook,
     createJournalEntry,
     addCompleteJournalEntry,
     createFastJournalEntry,
@@ -849,15 +631,7 @@ export const useLedger = (userId?: string) => {
     expireRunningBalancePeriod,
     deleteRunningBalance,
 
-    // Financial Statements
-    generateBalanceSheet,
-    generateIncomeStatement,
-    generateCashFlowStatement,
-
-    // Navigation
-    navigateTo,
-    goToDashboard,
-    setCurrentView,
+    // Entry selection
     setCurrentEntryId,
   };
 };

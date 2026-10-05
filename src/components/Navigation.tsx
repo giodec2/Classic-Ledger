@@ -1,200 +1,86 @@
+import { useLayoutEffect, useRef, useState } from 'react';
 import { useLedgerContext } from '@/hooks/LedgerContext';
-import {
-  BookOpen,
-  FileText,
-  LayoutGrid,
-  Scale,
-  ChevronLeft,
-  CalendarClock,
-  Landmark,
-  TrendingUp,
-  Wallet,
-  LogOut
-} from 'lucide-react';
+import { useManagerialContext } from '@/hooks/ManagerialContext';
+import { useNavigation } from '@/hooks/NavigationContext';
+import { ModeSwitch } from '@/components/ModeSwitch';
+import { BookOpen, FileText, LayoutGrid, Scale, ChevronLeft, CalendarClock, LogOut, Menu, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
+import type { ViewMode } from '@/types/accounting';
+
+const LEARNING_VIEWS = ['learning', 'journal-learning', 'adjusting-learning', 'final-learning', 'exam-cheat-sheet', 'academy-hub'];
+const FINANCIAL_TABS = [
+  { view: 'journal', label: 'Journal', Icon: FileText },
+  { view: 'ledger', label: 'T-Accounts', Icon: LayoutGrid },
+  { view: 'trial-balance', label: 'Trial Balance', Icon: Scale },
+  { view: 'running-balance', label: 'Running Balance', Icon: CalendarClock },
+] as const;
 
 export const Navigation = ({ user }: { user: User | null }) => {
-  const handleLogout = () => supabase.auth.signOut();
+  const { route, view, mode, navigate } = useNavigation();
+  const ledger = useLedgerContext();
+  const managerial = useManagerialContext();
+  const [expandedRoute, setExpandedRoute] = useState<typeof route | null>(null);
+  const expanded = expandedRoute === route;
+  const header = useRef<HTMLElement>(null);
   const displayName = user?.email?.split('@')[0] ?? '';
+  const isManagerial = mode === 'managerial';
+  const isDashboard = view === 'dashboard' || view === 'managerial-dashboard';
+  const financialWorkbook = !isManagerial && !isDashboard && !LEARNING_VIEWS.includes(view);
 
-  const {
-    currentView,
-    currentWorkbook,
-    goToDashboard,
-    setCurrentView,
-    currentWorkbookId,
-    createJournalEntry,
-    setCurrentEntryId,
-  } = useLedgerContext();
+  useLayoutEffect(() => {
+    if (!header.current) return;
+    const update = () => document.documentElement.style.setProperty('--ledger-navigation-height', `${header.current?.getBoundingClientRect().height ?? 100}px`);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(header.current);
+    return () => observer.disconnect();
+  }, []);
 
-  const handleNewEntry = () => {
-    if (currentWorkbookId) {
-      const entryId = createJournalEntry(currentWorkbookId);
-      setCurrentEntryId(entryId);
-      setCurrentView('journal');
-    }
+  const go = (next: ViewMode, workbookId?: string | null) => {
+    setExpandedRoute(null);
+    navigate(next, { workbookId });
   };
-
-  if (currentView === 'dashboard') {
-    return (
-      <nav className="fixed top-0 left-0 right-0 z-50 px-[8vw] py-6 flex items-center justify-between bg-ivory/80 backdrop-blur-sm">
-        <div className="font-sans text-label uppercase tracking-wide text-ink">
-          Classic Ledger
-        </div>
-        <div className="flex items-center gap-6">
-          {displayName && (
-            <span className="font-sans text-label text-text-secondary" style={{ fontFamily: 'var(--font-sans)' }}>
-              {displayName}
-            </span>
-          )}
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-1.5 font-sans text-label uppercase tracking-wide text-text-secondary hover:text-ink transition-colors"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            Sign out
-          </button>
-        </div>
-      </nav>
-    );
-  }
-
-  if (currentView === 'learning' || currentView === 'journal-learning' || currentView === 'adjusting-learning' || currentView === 'final-learning' || currentView === 'exam-cheat-sheet' || currentView === 'academy-hub') {
-    return (
-      <nav className="fixed top-0 left-0 right-0 z-50 px-[6vw] py-3 flex items-center justify-between bg-ivory/90 backdrop-blur-sm border-b border-guide">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={goToDashboard}
-            className="flex items-center gap-2 font-sans text-label uppercase tracking-wide text-text-secondary hover:text-ink transition-colors"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            Back
-          </button>
-          <div className="w-px h-4 bg-guide" />
-          <div className="font-serif text-heading text-ink truncate max-w-[200px]">
-            {currentView === 'academy-hub' ? 'Academy Simulators' : currentView === 'exam-cheat-sheet' ? 'Exam Cheat Sheet' : 'Learning Module'}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-6">
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-1.5 font-sans text-label uppercase tracking-wide text-text-secondary hover:text-ink transition-colors"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            Sign out
-          </button>
-        </div>
-      </nav>
-    );
-  }
+  const handleNewEntry = () => {
+    if (!ledger.currentWorkbookId) return;
+    const entryId = ledger.createJournalEntry(ledger.currentWorkbookId);
+    ledger.setCurrentEntryId(entryId);
+    go('journal', ledger.currentWorkbookId);
+  };
+  const title = isManagerial
+    ? managerial.currentWorkbook?.name ?? (view === 'cashflow-learning' ? 'Cash-flow Learning' : view === 'cashflow-cheat-sheet' ? 'Cash-flow Cheat Sheet' : 'Managerial Accounting')
+    : ledger.currentWorkbook?.name ?? (view === 'academy-hub' ? 'Academy Simulators' : view === 'exam-cheat-sheet' ? 'Exam Cheat Sheet' : 'Learning Module');
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 px-[6vw] py-3 flex items-center justify-between bg-ivory/90 backdrop-blur-sm border-b border-guide">
-      <div className="flex items-center gap-4">
-        <button
-          onClick={goToDashboard}
-          className="flex items-center gap-2 font-sans text-label uppercase tracking-wide text-text-secondary hover:text-ink transition-colors"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          Back
-        </button>
-        <div className="w-px h-4 bg-guide" />
-        <div className="font-serif text-heading text-ink truncate max-w-[200px]">
-          {currentWorkbook?.name || 'Workbook'}
+    <nav ref={header} className={`ledger-navigation ${expanded ? 'is-expanded' : ''}`} aria-label="Main navigation">
+      <a className="ledger-skip-link" href="#main-content" onClick={event => { event.preventDefault(); document.getElementById('main-content')?.focus(); }}>Skip to content</a>
+      <div className="ledger-navigation-top">
+        <div className="ledger-brand">
+          <ModeSwitch />
+          <button className="ledger-brand-name" onClick={() => go(isManagerial ? 'managerial-dashboard' : 'dashboard')}>Classic Ledger</button>
+        </div>
+        {!isDashboard && <span className="ledger-navigation-title" title={title}>{title}</span>}
+        <div className="ledger-account-actions">
+          {isDashboard && displayName && <span className="ledger-display-name">{displayName}</span>}
+          <button className="ledger-nav-link" onClick={() => { void supabase.auth.signOut(); }}><LogOut size={15} aria-hidden="true" /><span>Sign out</span></button>
+          {(isManagerial || !isDashboard) && <button className="ledger-menu-toggle" aria-expanded={expanded} aria-controls="ledger-navigation-links" aria-label={expanded ? 'Close navigation' : 'Open navigation'} onClick={() => setExpandedRoute(expanded ? null : route)}>{expanded ? <X size={20} /> : <Menu size={20} />}</button>}
         </div>
       </div>
-
-      <div className="flex items-center gap-1">
-        <button
-          onClick={() => setCurrentView('journal')}
-          className={`flex items-center gap-1.5 px-3 py-2 rounded-paper font-sans text-[10px] uppercase tracking-wide transition-all ${currentView === 'journal'
-            ? 'bg-ink text-ivory'
-            : 'text-text-secondary hover:text-ink hover:bg-guide/50'
-            }`}
-        >
-          <FileText className="w-3.5 h-3.5" />
-          Journal
-        </button>
-        <button
-          onClick={() => setCurrentView('ledger')}
-          className={`flex items-center gap-1.5 px-3 py-2 rounded-paper font-sans text-[10px] uppercase tracking-wide transition-all ${currentView === 'ledger'
-            ? 'bg-ink text-ivory'
-            : 'text-text-secondary hover:text-ink hover:bg-guide/50'
-            }`}
-        >
-          <LayoutGrid className="w-3.5 h-3.5" />
-          T-Accounts
-        </button>
-        <button
-          onClick={() => setCurrentView('trial-balance')}
-          className={`flex items-center gap-1.5 px-3 py-2 rounded-paper font-sans text-[10px] uppercase tracking-wide transition-all ${currentView === 'trial-balance'
-            ? 'bg-ink text-ivory'
-            : 'text-text-secondary hover:text-ink hover:bg-guide/50'
-            }`}
-        >
-          <Scale className="w-3.5 h-3.5" />
-          Trial Balance
-        </button>
-        <button
-          onClick={() => setCurrentView('running-balance')}
-          className={`flex items-center gap-1.5 px-3 py-2 rounded-paper font-sans text-[10px] uppercase tracking-wide transition-all ${currentView === 'running-balance'
-            ? 'bg-ink text-ivory'
-            : 'text-text-secondary hover:text-ink hover:bg-guide/50'
-            }`}
-        >
-          <CalendarClock className="w-3.5 h-3.5" />
-          Running Balance
-        </button>
-        <div className="w-px h-4 bg-guide mx-1" />
-        <button
-          onClick={() => setCurrentView('balance-sheet')}
-          className={`flex items-center gap-1.5 px-3 py-2 rounded-paper font-sans text-[10px] uppercase tracking-wide transition-all ${currentView === 'balance-sheet'
-            ? 'bg-ink text-ivory'
-            : 'text-text-secondary hover:text-ink hover:bg-guide/50'
-            }`}
-        >
-          <Landmark className="w-3.5 h-3.5" />
-          Balance Sheet
-        </button>
-        <button
-          onClick={() => setCurrentView('income-statement')}
-          className={`flex items-center gap-1.5 px-3 py-2 rounded-paper font-sans text-[10px] uppercase tracking-wide transition-all ${currentView === 'income-statement'
-            ? 'bg-ink text-ivory'
-            : 'text-text-secondary hover:text-ink hover:bg-guide/50'
-            }`}
-        >
-          <TrendingUp className="w-3.5 h-3.5" />
-          Income
-        </button>
-        <button
-          onClick={() => setCurrentView('cash-flow')}
-          className={`flex items-center gap-1.5 px-3 py-2 rounded-paper font-sans text-[10px] uppercase tracking-wide transition-all ${currentView === 'cash-flow'
-            ? 'bg-ink text-ivory'
-            : 'text-text-secondary hover:text-ink hover:bg-guide/50'
-            }`}
-        >
-          <Wallet className="w-3.5 h-3.5" />
-          Cash Flow
-        </button>
-        <div className="w-px h-4 bg-guide mx-1" />
-        <button
-          onClick={handleNewEntry}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-paper bg-accounting-red text-white font-sans text-[10px] uppercase tracking-wide hover:bg-accounting-red/90 transition-colors"
-        >
-          <BookOpen className="w-3.5 h-3.5" />
-          New Entry
-        </button>
-        <div className="w-px h-4 bg-guide mx-1" />
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-paper text-text-secondary hover:text-ink font-sans text-[10px] uppercase tracking-wide transition-colors"
-          title="Sign out"
-        >
-          <LogOut className="w-3.5 h-3.5" />
-        </button>
-      </div>
+      {(isManagerial || !isDashboard) && <div id="ledger-navigation-links" className="ledger-navigation-links">
+        {!isDashboard && <button className="ledger-nav-link" onClick={() => go(isManagerial ? 'managerial-dashboard' : 'dashboard')}><ChevronLeft size={16} aria-hidden="true" />Dashboard</button>}
+        {isManagerial && <>
+          <button className="ledger-nav-link" aria-current={view === 'cashflow-learning' ? 'page' : undefined} onClick={() => go('cashflow-learning')}>Learning</button>
+          <button className="ledger-nav-link" aria-current={view === 'cashflow-cheat-sheet' ? 'page' : undefined} onClick={() => go('cashflow-cheat-sheet')}>Cheat Sheet</button>
+          {route.workbookId && <>
+            <button className="ledger-nav-link" aria-current={view === 'cashflow-direct' ? 'page' : undefined} onClick={() => go('cashflow-direct', route.workbookId)}>Direct Method</button>
+            <button className="ledger-nav-link" aria-current={view === 'cashflow-indirect' ? 'page' : undefined} onClick={() => go('cashflow-indirect', route.workbookId)}>Indirect Method</button>
+          </>}
+        </>}
+        {financialWorkbook && <>
+          {FINANCIAL_TABS.map(({ view: tab, label, Icon }) => <button key={tab} className="ledger-nav-link" aria-current={view === tab ? 'page' : undefined} onClick={() => go(tab, route.workbookId)}><Icon size={15} aria-hidden="true" />{label}</button>)}
+          <button className="ledger-new-entry" onClick={handleNewEntry}><BookOpen size={15} aria-hidden="true" />New Entry</button>
+        </>}
+      </div>}
     </nav>
   );
 };

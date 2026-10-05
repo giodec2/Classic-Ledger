@@ -1,0 +1,218 @@
+.cf-education {
+    --cf-accent: var(--color-managerial, #175e60);
+    --cf-positive: #166b46;
+    --cf-negative: #a52f26;
+    --cf-tint: #eaf3ef;
+    color: var(--color-ink, #1a1a1a);
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    line-height: 1.6;
+    min-width: 0;
+}
+
+.cashflow-learning {
+    padding: 72px 6vw 80px;
+    background: var(--color-ivory, #f7f5f0);
+}
+
+.cf-learning-content { max-width: 1040px; margin: 0 auto; }
+.cf-study-header { text-align: center; margin-bottom: 40px; }
+.cf-study-header h1 {
+    font-family: var(--font-display, 'Fraunces', serif);
+    font-size: clamp(38px, 5vw, 64px);
+    line-height: 1.05;
+    letter-spacing: -.025em;
+    margin: 12px 0 20px;
+}
+.cf-study-header > p:last-child { font-family: var(--font-serif); font-size: 20px; max-width: 650px; margin: 0 auto; color: var(--color-text-secondary); }
+.cf-hero-icon { display: inline-flex; padding: 18px; background: var(--cf-accent); color: white; border-radius: 50%; margin-bottom: 12px; }
+.cf-eyebrow { color: var(--cf-accent); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.cf-study-card { margin-top: 32px; padding: 32px; border: 1px solid var(--color-guide); border-radius: 2px; background: var(--color-surface, white); box-shadow: 0 2px 0 #00000005; }
+.cf-study-card h2 { display: flex; gap: 14px; align-items: center; font-family: var(--font-serif); font-size: 28px; line-height: 1.2; margin-bottom: 24px; }
+.cf-number { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 36px; min-height: 36px; background: var(--cf-tint); color: var(--cf-accent); font: 600 13px var(--font-mono); }
+.cf-study-card p { margin: 16px 0; }
+.cf-study-card h3 { font: 600 20px/1.3 var(--font-serif); margin-bottom: 8px; color: var(--cf-accent); }
+.cf-two-columns, .cf-three-columns { display: grid; gap: 20px; margin: 20px 0; }
+.cf-two-columns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.cf-three-columns { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.cf-mini-card { padding: 20px; background: var(--color-ivory); border: 1px solid var(--color-guide); min-width: 0; }
+.cf-mini-card p { font-size: 14px; margin: 8px 0; }
+.cf-plus { color: var(--cf-positive); font-weight: 600; }
+.cf-minus { color: var(--cf-negative); font-weight: 600; }
+.cf-mono, .cf-total { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.cf-callout { background: var(--cf-tint); border: 1px solid #bdd4cb; border-left: 3px solid var(--cf-accent); padding: 18px 20px; font-size: 15px; }
+.cf-callout-neutral { background: var(--color-ivory); border-color: var(--color-guide); }
+.cf-warning { background: #fff5df; border-color: #e5c688; color: #6b4814; }
+.cf-method-map { display: flex; align-items: center; justify-content: center; gap: 24px; padding: 24px 0; }
+.cf-method-map > div { flex: 1; text-align: center; padding: 20px; border: 1px solid var(--color-guide); }
+.cf-method-map strong { display: block; color: var(--cf-accent); font: 600 24px var(--font-serif); }
+.cf-method-map span { font-size: 13px; }
+.cf-map-equals { color: var(--cf-accent); font-family: var(--font-mono); }
+.cf-table-wrap { min-width: 0; max-width: 100%; overflow-x: auto; margin: 20px 0; }
+.cf-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.cf-table caption { text-align: left; color: var(--color-text-secondary); font: 500 12px var(--font-sans); padding: 0 0 8px; }
+.cf-table th, .cf-table td { padding: 10px 12px; border-bottom: 1px solid var(--color-guide); vertical-align: top; }
+.cf-table thead { background: var(--cf-tint); color: var(--cf-accent); }
+.cf-table thead th { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.cf-table tbody th { font-weight: 600; }
+.cf-table-total { background: var(--cf-tint); font-weight: 700; border-top: 1px solid var(--cf-accent); border-bottom: 3px double var(--cf-accent); }
+.cf-formula { padding: 20px; border: 1px dashed #abc4ba; background: var(--cf-tint); color: var(--cf-accent); font: 500 15px/1.6 var(--font-mono); overflow-wrap: anywhere; margin: 20px 0; }
+.cf-formula > span, .cf-formula-stack > span { display: block; }
+.cf-formula > strong + span { font: 400 13px/1.5 var(--font-sans); margin-top: 8px; }
+.cf-total { margin: 16px 0; padding: 12px; color: var(--cf-accent); background: var(--cf-tint); border-top: 1px solid #bdd4cb; border-bottom: 3px double var(--cf-accent); font-weight: 600; overflow-wrap: anywhere; }
+.cf-reveal { border: 1px solid var(--color-guide); margin: 16px 0; padding: 0 18px; min-width: 0; }
+.cf-reveal summary { cursor: pointer; min-height: 48px; padding: 12px 0; font-weight: 600; color: var(--cf-accent); }
+.cf-reveal[open] summary { border-bottom: 1px solid var(--color-guide); }
+.cf-education :is(summary, button, [tabindex]):focus-visible { outline: 2px solid var(--cf-accent); outline-offset: 3px; }
+.cf-reveal summary:hover { color: var(--color-ink); }
+.cf-source { color: var(--color-text-secondary); font: 400 12px/1.5 var(--font-sans); }
+.cf-learning-content > footer { margin-top: 32px; text-align: center; }
+.cf-inline-icon { display: inline; vertical-align: middle; margin-right: 4px; color: var(--cf-accent); }
+.cf-cash-bridge { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; align-items: center; padding: 20px; background: var(--cf-tint); }
+.cf-cash-bridge span { font-size: 13px; }
+.cf-cash-bridge strong { display: block; color: var(--cf-accent); font: 600 24px var(--font-mono); }
+.cf-checklist { list-style: decimal; margin: 20px 0; padding-left: 24px; }
+.cf-checklist li { padding: 4px 0 4px 8px; }
+
+.cashflow-cheatsheet { padding: 40px 5vw 64px; background: var(--color-ivory); }
+.cf-sheet-toolbar { max-width: 980px; margin: 0 auto 32px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.cf-sheet-toolbar h1 { font: 600 clamp(30px, 4vw, 44px)/1.1 var(--font-display); margin: 8px 0; }
+.cf-sheet-toolbar p:last-child { font-size: 14px; color: var(--color-text-secondary); }
+.cf-print-button { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; flex-shrink: 0; padding: 12px 18px; color: white; background: var(--cf-accent); border: 1px solid var(--cf-accent); border-radius: 2px; cursor: pointer; font: 600 13px var(--font-sans); }
+.cf-print-button:hover { filter: brightness(.9); }
+.cf-cheat-page { max-width: 980px; margin: 0 auto 32px; padding: 32px; border: 1px solid var(--color-guide); box-shadow: 0 3px 10px #00000006; background: var(--color-surface); font-size: 14px; line-height: 1.5; }
+.cf-sheet-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-bottom: 16px; border-bottom: 2px solid var(--cf-accent); margin-bottom: 16px; }
+.cf-sheet-heading h2 { display: flex; align-items: center; gap: 10px; color: var(--cf-accent); font: 600 28px/1.15 var(--font-display); margin-top: 6px; }
+.cf-page-label { font: 500 13px var(--font-mono); color: var(--cf-accent); white-space: nowrap; }
+.cf-sheet-banner { padding: 12px; background: var(--cf-tint); border-left: 3px solid var(--cf-accent); margin-bottom: 16px; }
+.cf-sheet-block { margin-top: 22px; }
+.cf-sheet-block h3 { color: var(--cf-accent); font: 600 19px/1.2 var(--font-serif); margin-bottom: 10px; }
+.cf-sheet-block p { margin-top: 10px; }
+.cf-sheet-small { font-size: 12px; font-family: var(--font-sans); font-weight: 400; }
+.cf-sheet-note { padding: 10px 12px; background: var(--color-ivory); border: 1px solid var(--color-guide); margin-top: 10px; }
+.cf-formula-table td { font-family: var(--font-mono); font-size: 13px; }
+.cf-sheet-footer { display: flex; justify-content: space-between; gap: 16px; margin-top: 24px; padding-top: 10px; border-top: 1px solid var(--color-guide); color: var(--color-text-secondary); font-size: 11px; }
+.cf-sheet-footer span { white-space: nowrap; }
+.cf-manufacturing-box { padding: 16px; border: 1px solid var(--color-guide); background: var(--color-ivory); }
+
+.cashflow-cheatsheet .cf-sheet-block {
+    --cf-panel-ink: #175e60;
+    --cf-panel-tint: #edf5f2;
+    background: linear-gradient(var(--cf-panel-tint), var(--cf-panel-tint)) top / 100% 32px no-repeat;
+}
+.cashflow-cheatsheet .cf-cheat-page-one .cf-sheet-block:nth-of-type(3),
+.cashflow-cheatsheet .cf-cheat-page-one .cf-sheet-block:nth-of-type(4) { --cf-panel-ink: #245a8d; --cf-panel-tint: #edf3fa; }
+.cashflow-cheatsheet .cf-cheat-page-two .cf-sheet-block:first-of-type { --cf-panel-ink: #654584; --cf-panel-tint: #f2eef7; }
+.cashflow-cheatsheet .cf-cheat-page-two .cf-sheet-block:nth-of-type(3) { --cf-panel-ink: #245a8d; --cf-panel-tint: #edf3fa; }
+.cashflow-cheatsheet .cf-sheet-block h3 { color: var(--cf-panel-ink); position: relative; }
+.cashflow-cheatsheet .cf-sheet-block .cf-table thead { background: var(--cf-panel-tint); color: var(--cf-panel-ink); }
+.cashflow-cheatsheet .cf-manufacturing-box { --cf-panel-ink: #80531b; --cf-panel-tint: #fbf2e1; background: #fbf2e1; border-color: #ddc9a8; }
+.cashflow-cheatsheet .cf-sheet-icon { position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
+.cashflow-cheatsheet .cf-cheat-page-one .cf-sheet-block:nth-of-type(2) tbody tr:nth-child(1) > th { color: #175e60; background: #edf5f2; }
+.cashflow-cheatsheet .cf-cheat-page-one .cf-sheet-block:nth-of-type(2) tbody tr:nth-child(2) > th,
+.cashflow-cheatsheet .cf-cheat-page-two .cf-sheet-block:nth-of-type(2) tbody tr:nth-child(1) > th { color: #654584; background: #f2eef7; }
+.cashflow-cheatsheet .cf-cheat-page-one .cf-sheet-block:nth-of-type(2) tbody tr:nth-child(3) > th,
+.cashflow-cheatsheet .cf-cheat-page-two .cf-sheet-block:nth-of-type(2) tbody tr:nth-child(2) > th { color: #245a8d; background: #edf3fa; }
+.cashflow-cheatsheet .cf-cheat-page-one .cf-sheet-block:nth-of-type(2) tbody tr:nth-child(4) > th { color: #80531b; background: #fbf2e1; }
+.cashflow-cheatsheet .cf-table :is(th, td).cf-plus { background: #edf6ef; }
+.cashflow-cheatsheet .cf-table :is(th, td).cf-minus { background: #fbefed; }
+.cashflow-cheatsheet .cf-table td:is(.cf-plus, .cf-minus) { font-variant-numeric: tabular-nums; }
+@keyframes cf-enter { from { opacity: .6; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media screen and (prefers-reduced-motion: no-preference) {
+    .cf-study-header, .cf-study-card, .cf-cheat-page { animation: cf-enter 350ms ease-out; }
+    .cf-reveal[open] > :not(summary) { animation: cf-enter 220ms ease-out; }
+    .cf-mini-card { transition: border-color 180ms ease, box-shadow 180ms ease; }
+    .cf-mini-card:hover { border-color: #aac7bd; box-shadow: 0 3px 12px #175e600a; }
+}
+@media (prefers-reduced-motion: reduce) { .cf-education * { animation: none !important; transition: none !important; } }
+@media print {
+    .cf-education * { animation: none !important; transition: none !important; opacity: 1 !important; }
+    .cashflow-cheatsheet .cf-sheet-block { background-size: 100% 20px; }
+    .cashflow-cheatsheet .cf-manufacturing-box { background: #fbf2e1; }
+}
+
+@media screen and (max-width: 700px) {
+    .cashflow-learning { padding: 40px 5vw 48px; }
+    .cf-study-card { padding: 20px 16px; }
+    .cf-study-card h2 { font-size: 24px; align-items: flex-start; }
+    .cf-two-columns, .cf-three-columns { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+    .cf-method-map { flex-direction: column; gap: 12px; }
+    .cf-method-map > div { width: 100%; }
+    .cf-table th, .cf-table td { padding: 8px 6px; }
+    .cf-table { font-size: 12px; }
+    .cf-formula { padding: 14px; font-size: 13px; }
+    .cashflow-cheatsheet { padding: 32px 4vw; }
+    .cf-sheet-toolbar { flex-direction: column; align-items: flex-start; }
+    .cf-cheat-page { padding: 20px 12px; }
+    .cf-sheet-heading h2 { font-size: 23px; }
+    .cf-sheet-heading h2 svg { display: none; }
+    .cf-sheet-footer { flex-direction: column; gap: 4px; }
+    .cf-sheet-block h3 { font-size: 18px; }
+    .cf-sheet-block { font-size: 13px; }
+    .cf-formula-table td { font-size: 12px; }
+}
+
+@page cashflow {
+    size: A4;
+    margin: 10mm;
+}
+
+@media print {
+    body:has(.cashflow-cheatsheet) :focus-visible { outline: none !important; }
+    body:has(.cashflow-cheatsheet) { background: white !important; margin: 0 !important; }
+    body:has(.cashflow-cheatsheet) :is(#root, #root *):has(.cashflow-cheatsheet) {
+        margin: 0 !important;
+        padding: 0 !important;
+        min-height: 0 !important;
+        height: auto !important;
+        max-width: none !important;
+        overflow: visible !important;
+        background: white !important;
+    }
+    body:has(.cashflow-cheatsheet) :is(body, #root, #root *):has(.cashflow-cheatsheet) > :not(:has(.cashflow-cheatsheet)):not(.cashflow-cheatsheet) { display: none !important; }
+    .cashflow-cheatsheet .cf-no-print { display: none !important; }
+    .cashflow-cheatsheet {
+        page: cashflow;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: white;
+        break-inside: auto !important;
+        page-break-inside: auto !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+    .cashflow-cheatsheet .cf-cheat-page {
+        width: 190mm;
+        max-width: none;
+        min-height: 270mm;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        box-shadow: none;
+        font-size: 9pt;
+        line-height: 1.25;
+        display: flex;
+        flex-direction: column;
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+    .cashflow-cheatsheet .cf-cheat-page-one { break-after: page; page-break-after: always; }
+    .cashflow-cheatsheet .cf-cheat-page-two { break-after: auto; page-break-after: auto; }
+    .cashflow-cheatsheet .cf-sheet-heading { margin-bottom: 2mm; padding-bottom: 2mm; }
+    .cashflow-cheatsheet .cf-sheet-heading h2 { font-size: 20pt; }
+    .cashflow-cheatsheet .cf-eyebrow { font-size: 8pt; }
+    .cashflow-cheatsheet .cf-sheet-block { margin-top: 2.5mm; break-inside: avoid; }
+    .cashflow-cheatsheet .cf-sheet-block h3 { font-size: 12pt; margin-bottom: 1.5mm; }
+    .cashflow-cheatsheet .cf-sheet-banner { padding: 2mm; margin-bottom: 1mm; }
+    .cashflow-cheatsheet .cf-table { font-size: 9pt; line-height: 1.2; }
+    .cashflow-cheatsheet .cf-table th, .cashflow-cheatsheet .cf-table td { padding: 1mm 2mm; }
+    .cashflow-cheatsheet .cf-table th { overflow-wrap: normal; }
+    .cashflow-cheatsheet .cf-table thead th { font-size: 8pt; }
+    .cashflow-cheatsheet .cf-formula-table td { font-size: 8.8pt; }
+    .cashflow-cheatsheet .cf-sheet-small { font-size: 8pt; }
+    .cashflow-cheatsheet .cf-sheet-note { padding: 2mm; margin-top: 1.5mm; }
+    .cashflow-cheatsheet .cf-sheet-block p { margin-top: 1.5mm; }
+    .cashflow-cheatsheet .cf-two-columns { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3mm; margin: 0; }
+    .cashflow-cheatsheet .cf-total { margin: 1.5mm 0; padding: 2mm; }
+    .cashflow-cheatsheet .cf-manufacturing-box { padding: 2mm; }
+    .cashflow-cheatsheet .cf-sheet-footer { margin-top: auto; padding-top: 2mm; font-size: 7pt; }
+}
