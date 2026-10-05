@@ -13,15 +13,15 @@ export function CashFlowCheatSheet() {
             <div className="cf-sheet-banner"><strong>Δ = end − beginning.</strong> CFO = operating · CFI = investing · CFF = financing.<br /><strong>Only CFO presentation changes between methods.</strong> CFI, CFF and closing cash stay the same.</div>
 
             <div className="cf-sheet-block">
-                <h3>1 · Classify first — the slides use FASB</h3>
+                <h3>1 · Classify first — <span className="cf-no-print">the slides use </span>FASB</h3>
                 <table className="cf-table"><thead><tr><th scope="col">Section</th><th scope="col">+ Cash in</th><th scope="col">− Cash out</th></tr></thead><tbody>
                     <tr><th scope="row">Operating</th><td>Customers; interest & dividends received</td><td>Suppliers; wages & other operating costs; interest & income taxes paid</td></tr>
                     <tr><th scope="row">Investing</th><td>Plant / securities sold; loan principal collected</td><td>Plant / securities purchased; loans made</td></tr>
                     <tr><th scope="row">Financing</th><td>Borrowing principal; bonds / shares issued</td><td>Debt principal repaid; dividends paid</td></tr>
                     <tr><th scope="row">Noncash</th><td colSpan={2}>Asset acquired through a note / mortgage → disclose separately; no cash-flow entry.</td></tr>
                 </tbody></table>
-                <p><strong>Interest ≠ principal.</strong> Dividends received = operating; dividends paid = financing. IFRS alternatives exist: do not silently substitute them for this FASB slide convention.</p>
-                <p><strong>Cash equivalents:</strong> short-term, highly liquid investments maturing within 90 days of acquisition (slide definition). Transfers within cash / equivalents are excluded.</p>
+                <p><strong>Interest ≠ principal.</strong> Dividends received = operating; dividends paid = financing. IFRS alternatives exist: do not silently substitute them for this FASB <span className="cf-no-print">slide </span>convention.</p>
+                <p><strong>Cash equivalents:</strong> short-term, highly liquid investments maturing within 90 days of acquisition<span className="cf-no-print"> (slide definition)</span>. Transfers within cash / equivalents are excluded.</p>
             </div>
 
             <div className="cf-sheet-block">
@@ -38,7 +38,7 @@ export function CashFlowCheatSheet() {
                 <div className="cf-sheet-note"><strong>Payment rule:</strong> formulas give positive payment magnitudes; subtract them once in CFO. A negative Δ stays negative inside the formula: 36 − (−2) = 38 paid.</div>
                 <p className="cf-sheet-small">¹ Merchandiser shortcut, not a complete manufacturing cash formula. ² Remove deferred / noncash tax adjustments if given. All formulas assume account changes relate to that line; separate noncash/unrelated changes.</p>
                 <div className="cf-total">CFO = operating receipts − operating payments</div>
-                <p><strong>Presentation:</strong> the deck’s FASB direct method requires a supplementary net-income-to-CFO reconciliation (slide 76).</p>
+                <p><strong>Presentation:</strong> <span className="cf-no-print">the deck’s </span>FASB direct method requires a supplementary net-income-to-CFO reconciliation<span className="cf-no-print"> (slide 76)</span>.</p>
             </div>
 
             <div className="cf-sheet-block">

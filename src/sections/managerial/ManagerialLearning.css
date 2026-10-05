@@ -153,7 +153,7 @@
 
 @page cashflow {
     size: A4;
-    margin: 10mm;
+    margin: 15mm;
 }
 
 @media print {
@@ -169,7 +169,7 @@
         background: white !important;
     }
     body:has(.cashflow-cheatsheet) :is(body, #root, #root *):has(.cashflow-cheatsheet) > :not(:has(.cashflow-cheatsheet)):not(.cashflow-cheatsheet) { display: none !important; }
-    .cashflow-cheatsheet .cf-no-print { display: none !important; }
+    .cashflow-cheatsheet :is(.cf-no-print, .cf-sheet-footer, .cf-page-label, .cf-sheet-heading .cf-eyebrow, a) { display: none !important; }
     .cashflow-cheatsheet {
         page: cashflow;
         padding: 0 !important;
@@ -181,38 +181,37 @@
         -webkit-print-color-adjust: exact;
     }
     .cashflow-cheatsheet .cf-cheat-page {
-        width: 190mm;
-        max-width: none;
-        min-height: 270mm;
-        margin: 0;
+        width: 180mm;
+        max-width: 100%;
+        min-height: 264mm;
+        margin: 0 auto;
         padding: 0;
         border: 0;
         box-shadow: none;
-        font-size: 9pt;
+        font-size: 8.5pt;
         line-height: 1.25;
         display: flex;
         flex-direction: column;
+        justify-content: center;
         break-inside: avoid;
         page-break-inside: avoid;
     }
     .cashflow-cheatsheet .cf-cheat-page-one { break-after: page; page-break-after: always; }
     .cashflow-cheatsheet .cf-cheat-page-two { break-after: auto; page-break-after: auto; }
     .cashflow-cheatsheet .cf-sheet-heading { margin-bottom: 2mm; padding-bottom: 2mm; }
-    .cashflow-cheatsheet .cf-sheet-heading h2 { font-size: 20pt; }
-    .cashflow-cheatsheet .cf-eyebrow { font-size: 8pt; }
+    .cashflow-cheatsheet .cf-sheet-heading h2 { font-size: 19pt; }
     .cashflow-cheatsheet .cf-sheet-block { margin-top: 2.5mm; break-inside: avoid; }
-    .cashflow-cheatsheet .cf-sheet-block h3 { font-size: 12pt; margin-bottom: 1.5mm; }
+    .cashflow-cheatsheet .cf-sheet-block h3 { font-size: 11.5pt; margin-bottom: 1.5mm; }
     .cashflow-cheatsheet .cf-sheet-banner { padding: 2mm; margin-bottom: 1mm; }
-    .cashflow-cheatsheet .cf-table { font-size: 9pt; line-height: 1.2; }
+    .cashflow-cheatsheet .cf-table { font-size: 8.5pt; line-height: 1.2; }
     .cashflow-cheatsheet .cf-table th, .cashflow-cheatsheet .cf-table td { padding: 1mm 2mm; }
     .cashflow-cheatsheet .cf-table th { overflow-wrap: normal; }
     .cashflow-cheatsheet .cf-table thead th { font-size: 8pt; }
-    .cashflow-cheatsheet .cf-formula-table td { font-size: 8.8pt; }
+    .cashflow-cheatsheet .cf-formula-table td { font-size: 8.3pt; }
     .cashflow-cheatsheet .cf-sheet-small { font-size: 8pt; }
     .cashflow-cheatsheet .cf-sheet-note { padding: 2mm; margin-top: 1.5mm; }
     .cashflow-cheatsheet .cf-sheet-block p { margin-top: 1.5mm; }
     .cashflow-cheatsheet .cf-two-columns { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3mm; margin: 0; }
     .cashflow-cheatsheet .cf-total { margin: 1.5mm 0; padding: 2mm; }
     .cashflow-cheatsheet .cf-manufacturing-box { padding: 2mm; }
-    .cashflow-cheatsheet .cf-sheet-footer { margin-top: auto; padding-top: 2mm; font-size: 7pt; }
 }
